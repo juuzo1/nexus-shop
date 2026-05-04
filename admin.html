@@ -1,0 +1,2415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin · Nexus.Market</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-base: #070B14;
+    --bg-surface: #0D1320;
+    --bg-elevated: #111827;
+    --bg-card: #131B2D;
+    --bg-input: #0A0F1C;
+    --border-subtle: #1F2937;
+    --border-default: #1F2A3F;
+    --border-hover: #2D3B57;
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-muted: #9CA3AF;
+    --text-faint: #64748B;
+    --accent-blue: #3AABFF;
+    --accent-blue-deep: #3A7BD5;
+    --accent-blue-glow: rgba(58, 171, 255, 0.35);
+    --success-green: #10B981;
+    --warn-amber: #F59E0B;
+    --danger-red: #DC2626;
+    --gradient-primary: linear-gradient(90deg, #3A7BD5 0%, #3AABFF 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* Layout: sidebar + main */
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border-subtle);
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    margin-bottom: 18px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .sidebar-logo-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--gradient-primary);
+    display: grid;
+    place-items: center;
+    color: white;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    box-shadow: 0 4px 14px rgba(58, 123, 213, 0.4);
+  }
+  .sidebar-logo-mark::after {
+    content: 'A';
+  }
+  .sidebar-section-label {
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    padding: 16px 12px 6px;
+  }
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    user-select: none;
+  }
+  .sidebar-link:hover {
+    background: rgba(255,255,255,0.03);
+    color: var(--text-primary);
+  }
+  .sidebar-link.active {
+    background: rgba(58, 171, 255, 0.1);
+    color: var(--accent-blue);
+  }
+  .sidebar-link svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .sidebar-footer .sidebar-link {
+    color: var(--text-faint);
+    font-size: 12px;
+  }
+
+  /* MAIN */
+  .main {
+    padding: 32px 40px;
+    max-width: 1100px;
+    width: 100%;
+  }
+  .page-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .page-title {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .page-subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  /* Hidden pages */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* CARDS / SECTIONS */
+  .card-block {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+  }
+  .card-block-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .card-block-desc {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+  }
+
+  /* FORM */
+  .field {
+    margin-bottom: 16px;
+  }
+  .field-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .field-hint {
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 4px;
+  }
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .field-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+  .field-row-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 14px;
+  }
+  input, textarea, select {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: 7px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 13px;
+    padding: 9px 12px;
+    transition: all 0.18s;
+    outline: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(58, 171, 255, 0.12);
+  }
+  input::placeholder, textarea::placeholder { color: var(--text-faint); }
+  textarea { resize: vertical; min-height: 70px; font-family: inherit; }
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+    padding-right: 32px;
+  }
+
+  /* CHECKBOX (boolean) */
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checkbox-row input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-blue);
+    cursor: pointer;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn:hover { border-color: var(--accent-blue); }
+  .btn svg { width: 14px; height: 14px; }
+
+  .btn-primary {
+    background: var(--gradient-primary);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 12px rgba(58, 123, 213, 0.3);
+  }
+  .btn-primary:hover { filter: brightness(1.12); border-color: transparent; }
+
+  .btn-danger {
+    color: #FF6B6B;
+    border-color: rgba(220, 38, 38, 0.3);
+  }
+  .btn-danger:hover {
+    background: rgba(220, 38, 38, 0.1);
+    border-color: rgba(220, 38, 38, 0.6);
+    color: #FF8585;
+  }
+
+  .btn-sm {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .actions-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--success-green);
+    color: var(--text-primary);
+    padding: 14px 20px;
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5), 0 0 0 3px rgba(16, 185, 129, 0.12);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 1000;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  .toast svg {
+    width: 18px;
+    height: 18px;
+    color: var(--success-green);
+  }
+  .toast.error {
+    border-color: var(--danger-red);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5), 0 0 0 3px rgba(220, 38, 38, 0.12);
+  }
+  .toast.error svg { color: var(--danger-red); }
+
+  /* DASHBOARD STAT CARDS */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .dash-stat {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .dash-stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .dash-stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-top: 8px;
+    letter-spacing: -0.02em;
+  }
+  .dash-stat-value .accent { color: var(--accent-blue); }
+
+  /* PRODUCT/FAQ LIST ROWS */
+  .item-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: border-color 0.15s ease;
+  }
+  .item-row:hover { border-color: var(--border-hover); }
+  .item-row-thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+  .item-row-main {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .item-row-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .item-row-meta {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .item-row-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .icon-btn {
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: 1px solid var(--border-default);
+    color: var(--text-muted);
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .icon-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--accent-blue);
+  }
+  .icon-btn.danger:hover {
+    color: #FF6B6B;
+    border-color: rgba(220, 38, 38, 0.6);
+  }
+  .icon-btn svg { width: 14px; height: 14px; }
+
+  /* MODAL */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-backdrop.show { display: flex; }
+  @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+
+  .modal {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 720px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 24px 28px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  }
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .modal-title { font-size: 17px; font-weight: 700; }
+
+  /* Section tabs (for product sections page) */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 18px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .tab {
+    flex: 1;
+    padding: 9px 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .tab:hover { color: var(--text-primary); }
+  .tab.active {
+    background: var(--bg-elevated);
+    color: var(--accent-blue);
+    box-shadow: 0 0 0 1px var(--border-default);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; flex-direction: row; overflow-x: auto; padding: 14px; }
+    .sidebar-section-label, .sidebar-footer { display: none; }
+    .sidebar-link { white-space: nowrap; }
+    .main { padding: 22px 18px; }
+    .dash-grid { grid-template-columns: repeat(2, 1fr); }
+    .field-row, .field-row-3, .field-row-4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark"></div>
+      <span>Admin Panel</span>
+    </div>
+
+    <div class="sidebar-section-label">Site Content</div>
+    <a class="sidebar-link active" data-page="dashboard">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a class="sidebar-link" data-page="branding">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      Logo &amp; Menu
+    </a>
+    <a class="sidebar-link" data-page="hero">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22h20"/><path d="M6.36 17.4 4 17l-2-4 1.1-.55a2 2 0 0 1 1.8 0l.17.1a2 2 0 0 0 1.8 0L8 12 5 6l.9-.45a2 2 0 0 1 2.09.2l4.02 3a2 2 0 0 0 2.1.2l4.19-2.06a2.4 2.4 0 0 1 1.73-.17L21 7v14"/></svg>
+      Hero Section
+    </a>
+    <a class="sidebar-link" data-page="sections">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+      Product Sections
+    </a>
+    <a class="sidebar-link" data-page="faq">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+      FAQ
+    </a>
+
+    <a class="sidebar-link" data-page="products">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+      Products
+    </a>
+
+    <a class="sidebar-link" data-page="users">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Users
+    </a>
+
+    <div class="sidebar-section-label">System</div>
+    <a class="sidebar-link" data-page="settings">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      Settings
+    </a>
+
+    <div class="sidebar-footer">
+      <a class="sidebar-link" href="index.html" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+        View site
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ========== DASHBOARD ========== -->
+    <div class="page active" data-page-name="dashboard">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-subtitle">Overview of your site content</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="dash-stat">
+          <div class="dash-stat-label">Menu Items</div>
+          <div class="dash-stat-value" id="dash-menu-count">0</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Sections</div>
+          <div class="dash-stat-value" id="dash-section-count">0</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Total Products</div>
+          <div class="dash-stat-value" id="dash-product-count">0</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">FAQ Items</div>
+          <div class="dash-stat-value" id="dash-faq-count">0</div>
+        </div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-block-title">Welcome to Nexus.Market Admin</div>
+        <div class="card-block-desc">
+          Use the sidebar to manage your site content. Changes are saved instantly to your browser's local storage.
+          Open <strong>marketplace.html</strong> in another tab to see updates live.
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <a class="btn btn-primary" href="index.html" target="_blank">
+            Open Site
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+          </a>
+          <button class="btn" onclick="navigate('branding')">Edit Logo &amp; Menu</button>
+          <button class="btn" onclick="navigate('sections')">Edit Products</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== BRANDING (Logo + Menu) ========== -->
+    <div class="page" data-page-name="branding">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Logo &amp; Menu</div>
+          <div class="page-subtitle">Site branding and main navigation</div>
+        </div>
+      </div>
+
+      <!-- Logo -->
+      <div class="card-block">
+        <div class="card-block-title">Logo</div>
+        <div class="card-block-desc">The site name that appears in the header and footer.</div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Logo text</label>
+            <input type="text" id="logo-text" placeholder="Nexus.Market" />
+            <div class="field-hint">e.g. "Nexus.Market" or "MySite.com"</div>
+          </div>
+          <div class="field">
+            <label class="field-label">Accent character index</label>
+            <input type="number" id="logo-accent-index" min="0" />
+            <div class="field-hint">Position (0-based) of the character to highlight in blue. e.g. for "Nexus.Market", use 5 to highlight the dot.</div>
+          </div>
+        </div>
+        <div class="actions-bar">
+          <button class="btn btn-primary" onclick="saveLogo()">Save Logo</button>
+        </div>
+      </div>
+
+      <!-- Menu -->
+      <div class="card-block">
+        <div class="card-block-title">Menu Items</div>
+        <div class="card-block-desc">The navigation links below the search bar.</div>
+        <div id="menu-list"></div>
+        <div class="actions-bar">
+          <button class="btn" onclick="addMenuItem()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Add menu item
+          </button>
+          <button class="btn btn-primary" onclick="saveMenu()">Save Menu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== HERO ========== -->
+    <div class="page" data-page-name="hero">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Hero Section</div>
+          <div class="page-subtitle">The big banner at the top of the homepage</div>
+        </div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-block-title">Headline</div>
+        <div class="card-block-desc">Main title and short description.</div>
+        <div class="field">
+          <label class="field-label">Title (HTML allowed)</label>
+          <textarea id="hero-title" rows="3"></textarea>
+          <div class="field-hint">You can use &lt;br&gt; for line breaks and &lt;span class="accent"&gt;...&lt;/span&gt; for blue highlight.</div>
+        </div>
+        <div class="field">
+          <label class="field-label">Description</label>
+          <textarea id="hero-desc" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-block-title">Call-to-Action Buttons</div>
+        <div class="card-block-desc">Two buttons below the headline.</div>
+        <div id="hero-ctas-list"></div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-block-title">Statistics</div>
+        <div class="card-block-desc">Four stat boxes shown below the buttons.</div>
+        <div id="hero-stats-list"></div>
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="saveHero()">Save Hero</button>
+      </div>
+    </div>
+
+    <!-- ========== PRODUCT SECTIONS ========== -->
+    <div class="page" data-page-name="sections">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Product Sections</div>
+          <div class="page-subtitle">Manage product groupings (Best Sellers, Trending, etc.)</div>
+        </div>
+        <button class="btn" onclick="addSection()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Add section
+        </button>
+      </div>
+
+      <div class="tabs" id="sections-tabs"></div>
+
+      <div id="section-editor"></div>
+    </div>
+
+    <!-- ========== FAQ ========== -->
+    <div class="page" data-page-name="faq">
+      <div class="page-head">
+        <div>
+          <div class="page-title">FAQ</div>
+          <div class="page-subtitle">Frequently asked questions</div>
+        </div>
+        <button class="btn" onclick="addFaq()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Add question
+        </button>
+      </div>
+
+      <div class="card-block">
+        <div class="card-block-title">Header</div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Title</label>
+            <input type="text" id="faq-title" />
+          </div>
+          <div class="field">
+            <label class="field-label">Subtitle</label>
+            <input type="text" id="faq-subtitle" />
+          </div>
+        </div>
+        <div class="actions-bar">
+          <button class="btn btn-primary" onclick="saveFaqHeader()">Save Header</button>
+        </div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-block-title">Questions</div>
+        <div class="card-block-desc">Click any question to edit. Use the up/down arrows to reorder.</div>
+        <div id="faq-list"></div>
+        <div class="actions-bar" style="margin-top: 16px;">
+          <button class="btn btn-primary" onclick="saveAllFaqItems()">Save All FAQ Items</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SETTINGS ========== -->
+    <!-- ========== PRODUCTS ========== -->
+    <div class="page" data-page-name="products">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Products</div>
+          <div class="page-subtitle">Manage your product catalog</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="color: var(--text-muted); font-size: 13px;">Total: <strong id="products-count" style="color: var(--text-primary);">0</strong></div>
+          <button class="btn" onclick="renderProducts()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Refresh
+          </button>
+          <button class="btn btn-primary" onclick="openProductForm()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Add Product
+          </button>
+        </div>
+      </div>
+
+      <div class="card-block" style="padding: 0; overflow: hidden;">
+        <div style="padding: 14px 16px; border-bottom: 1px solid var(--border-default); display:flex; gap:10px;">
+          <input id="products-search" type="text" placeholder="🔍 Search by name..." style="flex:1; height: 38px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 8px; color: var(--text-primary); padding: 0 12px; font-family: inherit; font-size: 13.5px; outline: none;" />
+          <select id="products-filter-category" style="height: 38px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 8px; color: var(--text-primary); padding: 0 10px; font-family: inherit; font-size: 13.5px; outline: none; min-width: 180px;">
+            <option value="">All categories</option>
+          </select>
+        </div>
+        <div style="overflow-x: auto;">
+          <table id="products-table" style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+            <thead>
+              <tr style="background: var(--bg-elevated); color: var(--text-muted); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase;">
+                <th style="text-align: left; padding: 12px 16px; font-weight: 600;">Product</th>
+                <th style="text-align: left; padding: 12px 16px; font-weight: 600;">Category</th>
+                <th style="text-align: right; padding: 12px 16px; font-weight: 600;">Price</th>
+                <th style="text-align: right; padding: 12px 16px; font-weight: 600;">Orders</th>
+                <th style="text-align: center; padding: 12px 16px; font-weight: 600;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody"></tbody>
+          </table>
+        </div>
+        <div id="products-empty" style="padding: 40px; text-align: center; color: var(--text-muted); display: none;">
+          No products yet. Click <strong>Add Product</strong> to create one.
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== USERS ========== -->
+    <div class="page" data-page-name="users">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Users</div>
+          <div class="page-subtitle">All registered accounts (read-only)</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="color: var(--text-muted); font-size: 13px;">Total: <strong id="users-count" style="color: var(--text-primary);">0</strong></div>
+          <button class="btn" onclick="renderUsers()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="card-block" style="padding: 0; overflow: hidden;">
+        <div style="padding: 14px 16px; border-bottom: 1px solid var(--border-default);">
+          <input id="users-search" type="text" placeholder="🔍 Search by email or name..." style="width: 100%; height: 38px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: 8px; color: var(--text-primary); padding: 0 12px; font-family: inherit; font-size: 13.5px; outline: none;" />
+        </div>
+        <div id="users-table-wrap" style="overflow-x: auto;">
+          <table id="users-table" style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+            <thead>
+              <tr style="background: var(--bg-elevated); color: var(--text-muted); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase;">
+                <th style="text-align: left; padding: 12px 16px; font-weight: 600;">Display name</th>
+                <th style="text-align: left; padding: 12px 16px; font-weight: 600;">User ID</th>
+                <th style="text-align: left; padding: 12px 16px; font-weight: 600;">Created</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+        <div id="users-empty" style="padding: 40px; text-align: center; color: var(--text-muted); display: none;">
+          No users found.
+        </div>
+      </div>
+
+      <div class="card-block" style="margin-top: 16px;">
+        <div class="card-block-title">⚠ About this list</div>
+        <div class="card-block-desc">
+          This shows rows from the <code>profiles</code> table (created automatically when users sign up).
+          Email addresses live in <code>auth.users</code> which is not directly readable from the browser
+          for security. To see emails, use the Supabase dashboard → Authentication → Users.
+        </div>
+      </div>
+    </div>
+
+        <div class="page" data-page-name="settings">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Settings</div>
+          <div class="page-subtitle">Backup &amp; reset</div>
+        </div>
+      </div>
+
+      <div class="card-block">
+        <div class="card-block-title">Export data</div>
+        <div class="card-block-desc">Download your current content as a JSON file. Useful for backup.</div>
+        <button class="btn" onclick="exportData()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download JSON
+        </button>
+      </div>
+
+      <div class="card-block">
+        <div class="card-block-title">Import data</div>
+        <div class="card-block-desc">Restore from a backup JSON file. This will replace ALL current content.</div>
+        <input type="file" id="import-file" accept="application/json" style="display:none;" onchange="importData(event)" />
+        <button class="btn" onclick="document.getElementById('import-file').click()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+          Upload JSON
+        </button>
+      </div>
+
+      <div class="card-block">
+        <div class="card-block-title">Reset to defaults</div>
+        <div class="card-block-desc">Restore all content to the original site state. <strong>This cannot be undone.</strong></div>
+        <button class="btn btn-danger" onclick="resetData()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Reset Everything
+        </button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- PRODUCT FORM MODAL -->
+<div class="modal-backdrop" id="product-modal-backdrop" onclick="if(event.target===this) closeProductForm()" style="display:none;">
+  <div class="modal" style="max-width: 720px; width: 95vw; max-height: 92vh; display: flex; flex-direction: column;">
+    <div style="padding: 18px 22px; border-bottom: 1px solid var(--border-default); display: flex; justify-content: space-between; align-items: center; flex-shrink:0;">
+      <div style="font-size: 17px; font-weight: 700; color: var(--text-primary);" id="product-modal-title">Add Product</div>
+      <button onclick="closeProductForm()" style="background:transparent; border:none; color: var(--text-muted); cursor:pointer; padding:4px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <div style="padding: 22px; overflow-y: auto; flex: 1;">
+      <form id="product-form" onsubmit="return false;">
+        <input type="hidden" id="pf-id" />
+
+        <div class="pf-row">
+          <label class="pf-label">Name <span class="pf-req">*</span></label>
+          <input class="pf-input" id="pf-name" type="text" required placeholder="ChatGPT Pro" />
+        </div>
+
+        <div class="pf-row">
+          <label class="pf-label">Short description (homepage card)</label>
+          <input class="pf-input" id="pf-desc" type="text" placeholder="Private OpenAI account · GPT-5" />
+        </div>
+
+        <div class="pf-row">
+          <label class="pf-label">Long description (product page)</label>
+          <textarea class="pf-input pf-textarea" id="pf-long-desc" rows="4" placeholder="Detailed product information..."></textarea>
+        </div>
+
+        <div class="pf-row">
+          <label class="pf-label">Category <span class="pf-req">*</span></label>
+          <select class="pf-input" id="pf-category" required>
+            <option value="">Select a category...</option>
+          </select>
+        </div>
+
+        <div class="pf-grid">
+          <div class="pf-row">
+            <label class="pf-label">Total orders</label>
+            <input class="pf-input" id="pf-orders" type="number" min="0" value="0" />
+          </div>
+          <div class="pf-row">
+            <label class="pf-label">Completion rate (%)</label>
+            <input class="pf-input" id="pf-completion" type="number" min="0" max="100" step="0.01" value="100" />
+          </div>
+          <div class="pf-row">
+            <label class="pf-label">Like rate (%)</label>
+            <input class="pf-input" id="pf-like" type="number" min="0" max="100" step="0.01" value="99" />
+          </div>
+          <div class="pf-row">
+            <label class="pf-label">Delivery time</label>
+            <input class="pf-input" id="pf-delivery" type="text" placeholder="Instant / 5 min / 1 hour" value="Instant" />
+          </div>
+        </div>
+
+        <div class="pf-row">
+          <label class="pf-label" style="display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none;">
+            <input type="checkbox" id="pf-featured" style="width:18px; height:18px; accent-color: var(--accent-blue); cursor:pointer;" />
+            <span>⭐ Show in <strong>Premium Picks</strong> section on homepage</span>
+          </label>
+          <div class="pf-help" style="margin-top:6px; margin-left:28px;">Hand-curated featured products. Only tick this for your best items.</div>
+        </div>
+
+        <div class="pf-row">
+          <label class="pf-label">Pricing options <span class="pf-req">*</span></label>
+          <div class="pf-help">Add at least 1 option. Customers will see these on the product page.</div>
+          <div id="pf-pricing-list"></div>
+          <button type="button" class="btn" onclick="pfAddPricingRow()" style="margin-top: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Add option
+          </button>
+        </div>
+
+        <div class="pf-row">
+          <label class="pf-label">Images <span class="pf-req">*</span> <span style="color: var(--text-muted); font-weight: 400; font-size: 12px;">(1-4 images, max 5MB each)</span></label>
+          <div class="pf-help">First image is the card cover. Drag to reorder.</div>
+          <div id="pf-images-grid"></div>
+          <input type="file" id="pf-image-input" accept="image/jpeg,image/png,image/webp" multiple style="display: none;" onchange="pfImageSelected(event)" />
+          <button type="button" class="btn" onclick="document.getElementById('pf-image-input').click()" style="margin-top: 8px;" id="pf-add-image-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            Upload image
+          </button>
+        </div>
+
+        <div id="pf-error" style="display:none; margin-top: 14px; padding: 11px 14px; border-radius: 8px; background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.4); color: #f87171; font-size: 13px;"></div>
+      </form>
+    </div>
+
+    <div style="padding: 16px 22px; border-top: 1px solid var(--border-default); display: flex; justify-content: flex-end; gap: 10px; flex-shrink: 0;">
+      <button class="btn" onclick="closeProductForm()">Cancel</button>
+      <button class="btn btn-primary" id="pf-save-btn" onclick="saveProduct()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save product
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pf-row { margin-bottom: 16px; }
+  .pf-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+  .pf-req { color: #f87171; }
+  .pf-help { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .pf-input {
+    width: 100%; height: 40px; background: var(--bg-input); border: 1px solid var(--border-default);
+    border-radius: 8px; color: var(--text-primary); padding: 0 12px;
+    font-family: inherit; font-size: 13.5px; outline: none; transition: border-color 0.15s;
+  }
+  .pf-input:focus { border-color: var(--accent-blue); }
+  .pf-textarea { height: auto; padding: 10px 12px; resize: vertical; min-height: 80px; }
+  .pf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .pf-grid { grid-template-columns: 1fr; } }
+
+  .pf-pricing-row {
+    display: grid; grid-template-columns: 1fr 140px 36px;
+    gap: 8px; margin-bottom: 8px; align-items: center;
+  }
+  .pf-pricing-row input { height: 38px; }
+  .pf-pricing-remove {
+    width: 36px; height: 36px; border: 1px solid var(--border-default); background: var(--bg-input);
+    border-radius: 8px; cursor: pointer; color: #f87171; display: grid; place-items: center;
+  }
+  .pf-pricing-remove:hover { background: rgba(220, 38, 38, 0.1); }
+
+  #pf-images-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .pf-image-tile {
+    position: relative; aspect-ratio: 1; border: 1px solid var(--border-default);
+    border-radius: 8px; overflow: hidden; background: var(--bg-input);
+  }
+  .pf-image-tile img { width: 100%; height: 100%; object-fit: cover; }
+  .pf-image-cover-badge {
+    position: absolute; top: 6px; left: 6px; background: var(--accent-blue);
+    color: white; font-size: 10px; font-weight: 700; padding: 3px 7px;
+    border-radius: 4px; letter-spacing: 0.04em;
+  }
+  .pf-image-remove {
+    position: absolute; top: 6px; right: 6px; width: 24px; height: 24px;
+    background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%;
+    cursor: pointer; display: grid; place-items: center;
+  }
+  .pf-image-remove:hover { background: rgba(220, 38, 38, 0.9); }
+  .pf-image-uploading {
+    display: grid; place-items: center; aspect-ratio: 1; border: 1px dashed var(--border-default);
+    border-radius: 8px; color: var(--text-muted); font-size: 12px;
+  }
+</style>
+
+
+<!-- MODAL container -->
+<div class="modal-backdrop" id="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toast-msg">Saved</span>
+</div>
+
+<!-- ============================================================
+     LOAD DATA + ADMIN LOGIC
+     ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="data.js"></script>
+<script>
+
+/* Admin loads data from Supabase via SITE_DATA_READY (defined in data.js).
+   For now, edits are buffered locally — clicking Save shows a notice that
+   write-back to Supabase is the next chapter of the build.
+   The frontend pages now read directly from Supabase, so admin's localStorage
+   no longer affects the live site. */
+let DATA = null;
+let CURRENT_SECTION_INDEX = 0;
+
+function persist() {
+  // TEMPORARY: write-to-database is the next stage. For now show notice.
+  toast('Saved locally. Database write-back is in the next stage.', false);
+}
+
+/* ---------- TOAST ---------- */
+function toast(msg, isError) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ---------- NAVIGATION ---------- */
+function navigate(pageName) {
+  document.querySelectorAll('.sidebar-link').forEach(l => {
+    l.classList.toggle('active', l.dataset.page === pageName);
+  });
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.toggle('active', p.dataset.pageName === pageName);
+  });
+  // Render specific page
+  if (pageName === 'dashboard') renderDashboard();
+  if (pageName === 'branding') renderBranding();
+  if (pageName === 'hero') renderHero();
+  if (pageName === 'sections') renderSections();
+  if (pageName === 'faq') renderFaq();
+  if (pageName === 'products') renderProducts();
+  if (pageName === 'users') renderUsers();
+}
+document.querySelectorAll('.sidebar-link[data-page]').forEach(l => {
+  l.addEventListener('click', () => navigate(l.dataset.page));
+});
+
+/* ============================================================
+   PRODUCTS — full CRUD
+   ============================================================ */
+let PRODUCTS_CACHE = [];
+let CATEGORIES_CACHE = [];
+let SELLERS_CACHE = [];
+let PF_IMAGES = []; // [{url, path, file?, uploading?}]
+
+async function ensureAdminLists() {
+  // Cache categories + sellers (used by form + filter)
+  if (CATEGORIES_CACHE.length === 0) {
+    try {
+      const { data } = await window.sb
+        .from('categories')
+        .select('id, label, slug')
+        .order('sort_order', { ascending: true });
+      CATEGORIES_CACHE = data || [];
+    } catch (e) { console.warn('[products] categories load failed', e); }
+  }
+  if (SELLERS_CACHE.length === 0) {
+    try {
+      const { data } = await window.sb
+        .from('sellers')
+        .select('id, name, avatar_color')
+        .limit(50);
+      SELLERS_CACHE = data || [];
+    } catch (e) { console.warn('[products] sellers load failed', e); }
+  }
+}
+
+async function renderProducts() {
+  const tbody = document.getElementById('products-tbody');
+  const empty = document.getElementById('products-empty');
+  const countEl = document.getElementById('products-count');
+  if (!tbody) return;
+
+  await ensureAdminLists();
+
+  // Populate filter dropdown
+  const filterSel = document.getElementById('products-filter-category');
+  if (filterSel && filterSel.options.length <= 1) {
+    CATEGORIES_CACHE.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.label;
+      filterSel.appendChild(opt);
+    });
+  }
+
+  tbody.innerHTML = '<tr><td colspan="5" style="padding:30px;text-align:center;color:var(--text-muted);">Loading...</td></tr>';
+  empty.style.display = 'none';
+
+  try {
+    const { data, error } = await window.sb
+      .from('products')
+      .select('id, name, slug, base_price, total_orders, category_id, images, theme, logo_class, logo_char')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    PRODUCTS_CACHE = data || [];
+    countEl.textContent = PRODUCTS_CACHE.length;
+    paintProducts();
+  } catch (e) {
+    console.error('[products]', e);
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:30px;text-align:center;color:#f87171;">Failed to load: ' + (e.message || e) + '</td></tr>';
+  }
+}
+
+function paintProducts() {
+  const tbody = document.getElementById('products-tbody');
+  const empty = document.getElementById('products-empty');
+  if (!tbody) return;
+  const q = (document.getElementById('products-search').value || '').toLowerCase().trim();
+  const catFilter = document.getElementById('products-filter-category').value;
+
+  let list = PRODUCTS_CACHE;
+  if (q) list = list.filter(p => (p.name || '').toLowerCase().includes(q));
+  if (catFilter) list = list.filter(p => p.category_id === catFilter);
+
+  if (list.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = list.map(p => {
+    const cat = CATEGORIES_CACHE.find(c => c.id === p.category_id);
+    const catLabel = cat ? cat.label : '<span style="color:var(--text-muted);">—</span>';
+    const cover = (p.images && p.images.length) ? p.images[0] : null;
+    const escName = String(p.name || '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const thumb = cover
+      ? `<div style="width:42px;height:42px;border-radius:8px;background:url('${cover}') center/cover;flex-shrink:0;"></div>`
+      : `<div style="width:42px;height:42px;border-radius:8px;background:var(--gradient-primary);display:grid;place-items:center;color:white;font-weight:700;flex-shrink:0;">${(p.logo_char || '?').slice(0,1)}</div>`;
+
+    return `
+      <tr style="border-top: 1px solid var(--border-default);">
+        <td style="padding: 12px 16px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            ${thumb}
+            <div>
+              <div style="font-weight:600;color:var(--text-primary);">${escName}</div>
+              <div style="font-size:12px;color:var(--text-muted);">${p.slug}</div>
+            </div>
+          </div>
+        </td>
+        <td style="padding: 12px 16px; color: var(--text-secondary);">${catLabel}</td>
+        <td style="padding: 12px 16px; text-align: right; color: var(--text-primary); font-weight: 600;">$${Number(p.base_price).toFixed(2)}</td>
+        <td style="padding: 12px 16px; text-align: right; color: var(--text-secondary);">${(p.total_orders || 0).toLocaleString()}</td>
+        <td style="padding: 12px 16px; text-align: center;">
+          <button class="btn" style="padding:6px 12px;" onclick="openProductForm('${p.id}')">Edit</button>
+          <button class="btn btn-danger" style="padding:6px 12px;" onclick="deleteProduct('${p.id}', '${escName.replace(/'/g, "\\'")}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+document.addEventListener('input', e => {
+  if (e.target && e.target.id === 'products-search') paintProducts();
+});
+document.addEventListener('change', e => {
+  if (e.target && e.target.id === 'products-filter-category') paintProducts();
+});
+
+// ---------- FORM ----------
+async function openProductForm(productId) {
+  await ensureAdminLists();
+
+  const isEdit = !!productId;
+  document.getElementById('product-modal-title').textContent = isEdit ? 'Edit product' : 'Add product';
+  document.getElementById('pf-id').value = productId || '';
+  document.getElementById('pf-error').style.display = 'none';
+
+  // Populate category dropdown
+  const catSel = document.getElementById('pf-category');
+  catSel.innerHTML = '<option value="">Select a category...</option>' +
+    CATEGORIES_CACHE.map(c => `<option value="${c.id}">${c.label}</option>`).join('');
+
+  // Reset
+  document.getElementById('pf-name').value = '';
+  document.getElementById('pf-desc').value = '';
+  document.getElementById('pf-long-desc').value = '';
+  document.getElementById('pf-orders').value = '0';
+  document.getElementById('pf-completion').value = '100';
+  document.getElementById('pf-like').value = '99';
+  document.getElementById('pf-delivery').value = 'Instant';
+  document.getElementById('pf-featured').checked = false;
+  PF_IMAGES = [];
+  document.getElementById('pf-pricing-list').innerHTML = '';
+
+  if (isEdit) {
+    // Load existing product + tiers
+    const product = PRODUCTS_CACHE.find(p => p.id === productId);
+    if (product) {
+      // Fetch full data including long_description, completion, etc
+      const { data: full } = await window.sb
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .maybeSingle();
+      const p = full || product;
+      document.getElementById('pf-name').value = p.name || '';
+      document.getElementById('pf-desc').value = p.description || '';
+      document.getElementById('pf-long-desc').value = p.long_description || '';
+      document.getElementById('pf-orders').value = p.total_orders || 0;
+      document.getElementById('pf-completion').value = p.completion_rate || 100;
+      document.getElementById('pf-like').value = p.like_rate || 99;
+      document.getElementById('pf-delivery').value = p.delivery_time || 'Instant';
+      document.getElementById('pf-featured').checked = !!p.is_featured;
+      catSel.value = p.category_id || '';
+      PF_IMAGES = (p.images || []).map(url => ({ url, path: extractStoragePath(url), uploading: false }));
+      paintImages();
+
+      // Load tiers
+      const { data: tiers } = await window.sb
+        .from('pricing_tiers')
+        .select('duration_id, duration_label, price, sort_order')
+        .eq('product_id', productId)
+        .order('sort_order', { ascending: true });
+      (tiers || []).forEach(t => pfAddPricingRow(t.duration_label, t.price));
+    }
+  }
+
+  if (document.querySelectorAll('.pf-pricing-row').length === 0) {
+    pfAddPricingRow('1 month', '');
+  }
+  paintImages();
+
+  document.getElementById('product-modal-backdrop').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProductForm() {
+  document.getElementById('product-modal-backdrop').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function pfAddPricingRow(label, price) {
+  const list = document.getElementById('pf-pricing-list');
+  const row = document.createElement('div');
+  row.className = 'pf-pricing-row';
+  row.innerHTML = `
+    <input class="pf-input" type="text" placeholder="e.g. 1 month, 30 days, Lifetime" value="${(label || '').replace(/"/g, '&quot;')}" />
+    <input class="pf-input" type="number" min="0" step="0.01" placeholder="Price (USD)" value="${price !== undefined && price !== '' ? price : ''}" />
+    <button type="button" class="pf-pricing-remove" onclick="this.parentElement.remove()" title="Remove">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    </button>
+  `;
+  list.appendChild(row);
+}
+
+function pfImageSelected(event) {
+  const files = Array.from(event.target.files || []);
+  event.target.value = ''; // reset for next selection
+  for (const file of files) {
+    if (PF_IMAGES.length >= 4) break;
+    if (file.size > 5 * 1024 * 1024) {
+      pfShowError('Image "' + file.name + '" exceeds 5MB limit.');
+      continue;
+    }
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+      pfShowError('Image "' + file.name + '" must be JPG, PNG, or WEBP.');
+      continue;
+    }
+    PF_IMAGES.push({ file, uploading: true, localUrl: URL.createObjectURL(file) });
+  }
+  paintImages();
+  uploadPendingImages();
+  updateAddImageBtn();
+}
+
+async function uploadPendingImages() {
+  for (let i = 0; i < PF_IMAGES.length; i++) {
+    const img = PF_IMAGES[i];
+    if (img.uploading && img.file) {
+      try {
+        const ext = img.file.name.split('.').pop().toLowerCase();
+        const path = 'product-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+        const { data, error } = await window.sb.storage
+          .from('product-images')
+          .upload(path, img.file, { contentType: img.file.type });
+        if (error) throw error;
+        const { data: pub } = window.sb.storage.from('product-images').getPublicUrl(path);
+        img.url = pub.publicUrl;
+        img.path = path;
+        img.uploading = false;
+        delete img.file;
+        if (img.localUrl) { URL.revokeObjectURL(img.localUrl); delete img.localUrl; }
+      } catch (e) {
+        console.error('[products] upload failed', e);
+        pfShowError('Upload failed: ' + (e.message || e));
+        PF_IMAGES.splice(i, 1);
+        i--;
+      }
+      paintImages();
+    }
+  }
+}
+
+function paintImages() {
+  const grid = document.getElementById('pf-images-grid');
+  if (!grid) return;
+  grid.innerHTML = PF_IMAGES.map((img, idx) => {
+    const src = img.url || img.localUrl;
+    if (img.uploading) {
+      return `<div class="pf-image-tile">
+        <img src="${src}" alt="" />
+        <div class="pf-image-uploading" style="position:absolute;inset:0;background:rgba(0,0,0,0.6);">Uploading...</div>
+      </div>`;
+    }
+    return `<div class="pf-image-tile" draggable="true" data-idx="${idx}"
+              ondragstart="pfImgDragStart(event, ${idx})"
+              ondragover="event.preventDefault()"
+              ondrop="pfImgDrop(event, ${idx})">
+      <img src="${src}" alt="" />
+      ${idx === 0 ? '<span class="pf-image-cover-badge">COVER</span>' : ''}
+      <button type="button" class="pf-image-remove" onclick="pfRemoveImage(${idx})" title="Remove">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+  updateAddImageBtn();
+}
+
+function updateAddImageBtn() {
+  const btn = document.getElementById('pf-add-image-btn');
+  if (btn) btn.style.display = PF_IMAGES.length >= 4 ? 'none' : '';
+}
+
+function pfRemoveImage(idx) {
+  const img = PF_IMAGES[idx];
+  if (img && img.path) {
+    // Best-effort delete from storage (ignore errors)
+    window.sb.storage.from('product-images').remove([img.path]).catch(() => {});
+  }
+  PF_IMAGES.splice(idx, 1);
+  paintImages();
+}
+
+let _dragSrcIdx = null;
+function pfImgDragStart(e, idx) { _dragSrcIdx = idx; }
+function pfImgDrop(e, idx) {
+  e.preventDefault();
+  if (_dragSrcIdx === null || _dragSrcIdx === idx) return;
+  const moved = PF_IMAGES.splice(_dragSrcIdx, 1)[0];
+  PF_IMAGES.splice(idx, 0, moved);
+  _dragSrcIdx = null;
+  paintImages();
+}
+
+function pfShowError(msg) {
+  const el = document.getElementById('pf-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { if (el.textContent === msg) el.style.display = 'none'; }, 5000);
+}
+
+function extractStoragePath(url) {
+  // Extracts path inside the bucket from a public URL
+  const m = (url || '').match(/\/product-images\/(.+)$/);
+  return m ? m[1] : '';
+}
+
+function slugify(s) {
+  return String(s || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || 'product-' + Date.now();
+}
+
+async function saveProduct() {
+  const id = document.getElementById('pf-id').value;
+  const isEdit = !!id;
+  const errEl = document.getElementById('pf-error');
+  errEl.style.display = 'none';
+
+  // Validate
+  const name = document.getElementById('pf-name').value.trim();
+  const desc = document.getElementById('pf-desc').value.trim();
+  const longDesc = document.getElementById('pf-long-desc').value.trim();
+  const categoryId = document.getElementById('pf-category').value;
+  const orders = parseInt(document.getElementById('pf-orders').value) || 0;
+  const completion = parseFloat(document.getElementById('pf-completion').value) || 100;
+  const likeRate = parseFloat(document.getElementById('pf-like').value) || 99;
+  const delivery = document.getElementById('pf-delivery').value.trim() || 'Instant';
+  const isFeatured = document.getElementById('pf-featured').checked;
+
+  if (!name) return pfShowError('Name is required.');
+  if (!categoryId) return pfShowError('Category is required.');
+
+  // Pricing tiers
+  const tierRows = document.querySelectorAll('.pf-pricing-row');
+  const tiers = [];
+  tierRows.forEach((row, idx) => {
+    const inputs = row.querySelectorAll('input');
+    const label = inputs[0].value.trim();
+    const price = parseFloat(inputs[1].value);
+    if (label && !isNaN(price) && price >= 0) {
+      tiers.push({ label, price, sort_order: idx + 1 });
+    }
+  });
+  if (tiers.length === 0) return pfShowError('Add at least 1 pricing option.');
+
+  // Images
+  if (PF_IMAGES.length === 0) return pfShowError('Upload at least 1 image.');
+  if (PF_IMAGES.some(i => i.uploading)) return pfShowError('Wait for image uploads to finish.');
+
+  const imageUrls = PF_IMAGES.map(i => i.url).filter(Boolean);
+  if (imageUrls.length === 0) return pfShowError('No images uploaded successfully.');
+
+  const basePrice = tiers[0].price;
+
+  // Auto-pick a random seller
+  if (SELLERS_CACHE.length === 0) await ensureAdminLists();
+  const seller = SELLERS_CACHE[Math.floor(Math.random() * SELLERS_CACHE.length)];
+  if (!seller) return pfShowError('No sellers found in database.');
+
+  const saveBtn = document.getElementById('pf-save-btn');
+  saveBtn.disabled = true;
+  saveBtn.style.opacity = '0.6';
+  const oldText = saveBtn.innerHTML;
+  saveBtn.innerHTML = 'Saving...';
+
+  try {
+    let productId = id;
+    const payload = {
+      name,
+      slug: isEdit ? undefined : slugify(name) + '-' + Math.random().toString(36).slice(2, 6),
+      description: desc || null,
+      long_description: longDesc || null,
+      base_price: basePrice,
+      seller_id: seller.id,
+      category_id: categoryId,
+      total_orders: orders,
+      completion_rate: completion,
+      like_rate: likeRate,
+      delivery_time: delivery,
+      is_featured: isFeatured,
+      images: imageUrls,
+      theme: 'chatgpt',  // default theme — legacy field
+      logo_class: 'gpt',
+      logo_char: name.charAt(0).toUpperCase(),
+      updated_at: new Date().toISOString()
+    };
+    // Remove undefined keys
+    Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+
+    if (isEdit) {
+      const { error } = await window.sb.from('products').update(payload).eq('id', id);
+      if (error) throw error;
+    } else {
+      const { data, error } = await window.sb.from('products').insert(payload).select('id').maybeSingle();
+      if (error) throw error;
+      productId = data.id;
+    }
+
+    // Replace pricing tiers
+    if (isEdit) {
+      await window.sb.from('pricing_tiers').delete().eq('product_id', productId);
+    }
+    const tierRows = tiers.map((t, idx) => ({
+      product_id: productId,
+      duration_id: 'opt' + (idx + 1),
+      duration_label: t.label,
+      price: t.price,
+      sort_order: t.sort_order
+    }));
+    const { error: tErr } = await window.sb.from('pricing_tiers').insert(tierRows);
+    if (tErr) throw tErr;
+
+    closeProductForm();
+    toast(isEdit ? 'Product updated' : 'Product created');
+    renderProducts();
+  } catch (e) {
+    console.error('[products] save failed', e);
+    pfShowError('Save failed: ' + (e.message || e));
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.style.opacity = '';
+    saveBtn.innerHTML = oldText;
+  }
+}
+
+async function deleteProduct(id, name) {
+  if (!confirm('Delete product "' + name + '"? This will also remove its pricing options and images. This action cannot be undone.')) return;
+  try {
+    // Get image paths first
+    const { data: prod } = await window.sb.from('products').select('images').eq('id', id).maybeSingle();
+    const paths = (prod && prod.images || []).map(extractStoragePath).filter(Boolean);
+
+    // Delete pricing tiers (FK cascade should handle this, but be explicit)
+    await window.sb.from('pricing_tiers').delete().eq('product_id', id);
+    // Delete product
+    const { error } = await window.sb.from('products').delete().eq('id', id);
+    if (error) throw error;
+    // Best-effort: delete images from storage
+    if (paths.length) {
+      window.sb.storage.from('product-images').remove(paths).catch(() => {});
+    }
+    toast('Product deleted');
+    renderProducts();
+  } catch (e) {
+    console.error('[products] delete failed', e);
+    alert('Delete failed: ' + (e.message || e));
+  }
+}
+
+/* ---------- USERS ---------- */
+let USERS_CACHE = [];
+
+async function renderUsers() {
+  const tbody = document.getElementById('users-tbody');
+  const empty = document.getElementById('users-empty');
+  const countEl = document.getElementById('users-count');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="3" style="padding: 30px; text-align: center; color: var(--text-muted);">Loading...</td></tr>';
+  empty.style.display = 'none';
+
+  try {
+    const { data, error } = await window.sb
+      .from('profiles')
+      .select('id, display_name, created_at')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    USERS_CACHE = data || [];
+    countEl.textContent = USERS_CACHE.length;
+    paintUsers(document.getElementById('users-search').value);
+  } catch (e) {
+    console.error('[users]', e);
+    tbody.innerHTML = '<tr><td colspan="3" style="padding: 30px; text-align: center; color: #f87171;">Failed to load users: ' + (e.message || e) + '</td></tr>';
+  }
+}
+
+function paintUsers(query) {
+  const tbody = document.getElementById('users-tbody');
+  const empty = document.getElementById('users-empty');
+  if (!tbody) return;
+
+  const q = (query || '').toLowerCase().trim();
+  const filtered = q
+    ? USERS_CACHE.filter(u =>
+        (u.display_name || '').toLowerCase().includes(q) ||
+        (u.id || '').toLowerCase().includes(q))
+    : USERS_CACHE;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = filtered.map(u => {
+    const date = new Date(u.created_at);
+    const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const initial = (u.display_name || '?').trim().charAt(0).toUpperCase();
+    const escName = String(u.display_name || '—').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+    return `
+      <tr style="border-top: 1px solid var(--border-default);">
+        <td style="padding: 12px 16px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--gradient-primary); display: grid; place-items: center; color: white; font-weight: 700; font-size: 13px;">${initial}</div>
+            <div style="font-weight: 600; color: var(--text-primary);">${escName}</div>
+          </div>
+        </td>
+        <td style="padding: 12px 16px; color: var(--text-muted); font-size: 12px; font-family: monospace;">${u.id}</td>
+        <td style="padding: 12px 16px; color: var(--text-muted);">${dateStr}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Hook the search box (delegate, runs once when first rendered)
+document.addEventListener('input', e => {
+  if (e.target && e.target.id === 'users-search') {
+    paintUsers(e.target.value);
+  }
+});
+
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard() {
+  document.getElementById('dash-menu-count').textContent = DATA.sub_nav.length;
+  document.getElementById('dash-section-count').textContent = DATA.sections.length;
+  const totalProducts = DATA.sections.reduce((sum, s) => sum + s.products.length, 0);
+  document.getElementById('dash-product-count').textContent = totalProducts;
+  document.getElementById('dash-faq-count').textContent = DATA.faq.items.length;
+}
+
+/* ---------- BRANDING (Logo + Menu) ---------- */
+function renderBranding() {
+  document.getElementById('logo-text').value = DATA.logo.text;
+  document.getElementById('logo-accent-index').value = DATA.logo.accent_index;
+  renderMenuList();
+}
+function renderMenuList() {
+  const list = document.getElementById('menu-list');
+  list.innerHTML = DATA.sub_nav.map((item, i) => `
+    <div class="item-row">
+      <div class="item-row-thumb" style="background: ${item.active ? 'var(--gradient-primary)' : 'var(--bg-elevated)'};">${i + 1}</div>
+      <div class="item-row-main" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: center;">
+        <input type="text" value="${escapeAttr(item.label)}" oninput="DATA.sub_nav[${i}].label=this.value" placeholder="Label" />
+        <input type="text" value="${escapeAttr(item.href)}" oninput="DATA.sub_nav[${i}].href=this.value" placeholder="URL (e.g. #marketplace)" />
+        <label class="checkbox-row">
+          <input type="checkbox" ${item.active ? 'checked' : ''} onchange="setActiveMenu(${i}, this.checked)" />
+          <span style="font-size:12px; color: var(--text-muted);">Active</span>
+        </label>
+      </div>
+      <div class="item-row-actions">
+        <button class="icon-btn" onclick="moveMenu(${i}, -1)" title="Move up">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+        </button>
+        <button class="icon-btn" onclick="moveMenu(${i}, 1)" title="Move down">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <button class="icon-btn danger" onclick="removeMenu(${i})" title="Delete">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
+    </div>`).join('');
+}
+function setActiveMenu(i, val) {
+  if (val) DATA.sub_nav.forEach((m, j) => m.active = j === i);
+  else DATA.sub_nav[i].active = false;
+  renderMenuList();
+}
+function moveMenu(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= DATA.sub_nav.length) return;
+  [DATA.sub_nav[i], DATA.sub_nav[j]] = [DATA.sub_nav[j], DATA.sub_nav[i]];
+  renderMenuList();
+}
+function removeMenu(i) {
+  if (!confirm('Delete this menu item?')) return;
+  DATA.sub_nav.splice(i, 1);
+  renderMenuList();
+}
+function addMenuItem() {
+  DATA.sub_nav.push({ label: 'New Item', href: '#', active: false });
+  renderMenuList();
+}
+async function saveLogo() {
+  const newText  = document.getElementById('logo-text').value;
+  const newIndex = parseInt(document.getElementById('logo-accent-index').value || '0', 10);
+
+  // Update local copy first so UI reflects change immediately
+  DATA.logo.text = newText;
+  DATA.logo.accent_index = newIndex;
+
+  // Push to Supabase site_settings table (single-row, id = 1)
+  try {
+    const { error } = await window.sb
+      .from('site_settings')
+      .update({ logo_text: newText, logo_accent_idx: newIndex })
+      .eq('id', 1);
+    if (error) throw error;
+    toast('Logo saved');
+  } catch (err) {
+    console.error('saveLogo error:', err);
+    toast('Save failed: ' + (err.message || 'unknown error'), true);
+  }
+}
+
+async function saveMenu() {
+  // The menu list in DATA.sub_nav is already the source of truth (admin edits it).
+  // Strategy: delete all rows from menu_items, insert fresh rows in current order.
+  // This is simple and bulletproof for a small list (~5 items). Larger lists would
+  // benefit from a diff-based update, but not needed here.
+  try {
+    // 1. Delete all existing rows
+    const { error: delErr } = await window.sb
+      .from('menu_items')
+      .delete()
+      .gte('sort_order', 0);  // matches all rows (sort_order is always >= 0)
+    if (delErr) throw delErr;
+
+    // 2. Insert fresh rows from current DATA.sub_nav, with sort_order based on array index
+    const rows = DATA.sub_nav.map((m, idx) => ({
+      label:      m.label,
+      href:       m.href,
+      is_active:  !!m.active,
+      sort_order: idx + 1
+    }));
+    if (rows.length > 0) {
+      const { error: insErr } = await window.sb
+        .from('menu_items')
+        .insert(rows);
+      if (insErr) throw insErr;
+    }
+
+    toast('Menu saved');
+  } catch (err) {
+    console.error('saveMenu error:', err);
+    toast('Save failed: ' + (err.message || 'unknown error'), true);
+  }
+}
+
+/* ---------- HERO ---------- */
+function renderHero() {
+  document.getElementById('hero-title').value = DATA.hero.title_html;
+  document.getElementById('hero-desc').value = DATA.hero.description;
+
+  document.getElementById('hero-ctas-list').innerHTML = DATA.hero.ctas.map((c, i) => `
+    <div class="card-block" style="background: var(--bg-input); padding: 16px 18px; margin-bottom: 10px;">
+      <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">Button ${i + 1}</div>
+      <div class="field-row-3">
+        <div class="field">
+          <label class="field-label">Label</label>
+          <input type="text" value="${escapeAttr(c.label)}" oninput="DATA.hero.ctas[${i}].label=this.value" />
+        </div>
+        <div class="field">
+          <label class="field-label">URL</label>
+          <input type="text" value="${escapeAttr(c.href)}" oninput="DATA.hero.ctas[${i}].href=this.value" />
+        </div>
+        <div class="field">
+          <label class="field-label">Style</label>
+          <select onchange="DATA.hero.ctas[${i}].style=this.value">
+            <option value="primary" ${c.style === 'primary' ? 'selected' : ''}>Primary (gradient)</option>
+            <option value="secondary" ${c.style === 'secondary' ? 'selected' : ''}>Secondary (outline)</option>
+          </select>
+        </div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('hero-stats-list').innerHTML = DATA.hero.stats.map((s, i) => `
+    <div class="card-block" style="background: var(--bg-input); padding: 16px 18px; margin-bottom: 10px;">
+      <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">Stat ${i + 1}</div>
+      <div class="field-row-3">
+        <div class="field">
+          <label class="field-label">Value</label>
+          <input type="text" value="${escapeAttr(s.value)}" oninput="DATA.hero.stats[${i}].value=this.value" placeholder="12.4K" />
+        </div>
+        <div class="field">
+          <label class="field-label">Suffix</label>
+          <input type="text" value="${escapeAttr(s.suffix)}" oninput="DATA.hero.stats[${i}].suffix=this.value" placeholder="+" />
+        </div>
+        <div class="field">
+          <label class="field-label">Label</label>
+          <input type="text" value="${escapeAttr(s.label)}" oninput="DATA.hero.stats[${i}].label=this.value" placeholder="Active Listings" />
+        </div>
+      </div>
+    </div>`).join('');
+}
+async function saveHero() {
+  // Pull current state from form fields into DATA (already done by oninput
+  // handlers, but the title/description still need an explicit pull)
+  DATA.hero.title_html  = document.getElementById('hero-title').value;
+  DATA.hero.description = document.getElementById('hero-desc').value;
+
+  // Build payload. JSONB columns accept JS arrays/objects directly.
+  // Note: form uses `href` for CTAs (HTML convention); DB column is `url`.
+  // We translate on the way out.
+  const payload = {
+    title_html:  DATA.hero.title_html,
+    description: DATA.hero.description,
+    ctas:  DATA.hero.ctas.map(c => ({
+      label: c.label,
+      url:   c.href || c.url || '#',
+      style: c.style || 'primary'
+    })),
+    stats: DATA.hero.stats.map(s => ({
+      value:  s.value,
+      suffix: s.suffix || '',
+      label:  s.label
+    }))
+  };
+
+  try {
+    const { error } = await window.sb
+      .from('hero_content')
+      .update(payload)
+      .eq('id', 1);
+    if (error) throw error;
+    toast('Hero saved');
+  } catch (err) {
+    console.error('saveHero error:', err);
+    toast('Save failed: ' + (err.message || 'unknown error'), true);
+  }
+}
+
+/* ---------- PRODUCT SECTIONS ---------- */
+function renderSections() {
+  const tabs = document.getElementById('sections-tabs');
+  tabs.innerHTML = DATA.sections.map((s, i) =>
+    `<button class="tab ${i === CURRENT_SECTION_INDEX ? 'active' : ''}" onclick="selectSection(${i})">${escapeText(s.title)}</button>`
+  ).join('');
+  renderSectionEditor();
+}
+function selectSection(i) {
+  CURRENT_SECTION_INDEX = i;
+  renderSections();
+}
+function renderSectionEditor() {
+  const s = DATA.sections[CURRENT_SECTION_INDEX];
+  if (!s) {
+    document.getElementById('section-editor').innerHTML = '<div class="card-block">No sections yet. Click "Add section" above.</div>';
+    return;
+  }
+
+  document.getElementById('section-editor').innerHTML = `
+    <div class="card-block">
+      <div class="card-block-title">Section info</div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label">Title</label>
+          <input type="text" value="${escapeAttr(s.title)}" oninput="DATA.sections[${CURRENT_SECTION_INDEX}].title=this.value; document.querySelectorAll('.tab')[${CURRENT_SECTION_INDEX}].textContent=this.value;" />
+        </div>
+        <div class="field">
+          <label class="field-label">Title link (URL)</label>
+          <input type="text" value="${escapeAttr(s.title_href)}" oninput="DATA.sections[${CURRENT_SECTION_INDEX}].title_href=this.value" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Subtitle</label>
+        <input type="text" value="${escapeAttr(s.subtitle)}" oninput="DATA.sections[${CURRENT_SECTION_INDEX}].subtitle=this.value" />
+      </div>
+      <div class="actions-bar">
+        <button class="btn btn-primary" onclick="saveCurrentSectionInfo()">Save info</button>
+        <button class="btn btn-danger" onclick="removeSection(${CURRENT_SECTION_INDEX})">Delete this section</button>
+      </div>
+    </div>
+
+    <div class="card-block">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <div>
+          <div class="card-block-title" style="margin-bottom:0">Products in this section</div>
+          <div class="card-block-desc" style="margin-bottom:0">${s.products.length} item${s.products.length === 1 ? '' : 's'}</div>
+        </div>
+        <button class="btn" onclick="openProductModal(${CURRENT_SECTION_INDEX}, -1)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Add product
+        </button>
+      </div>
+      <div>${s.products.map((p, pi) => productRow(p, pi)).join('')}</div>
+    </div>
+  `;
+}
+function productRow(p, pi) {
+  return `
+    <div class="item-row">
+      <div class="item-row-thumb" style="background: linear-gradient(135deg, ${p.color}, ${p.color}cc);">${escapeText(p.logo)}</div>
+      <div class="item-row-main">
+        <div class="item-row-title">${escapeText(p.name)}</div>
+        <div class="item-row-meta">$${escapeText(p.price)} · ${escapeText(p.seller)} · ${escapeText(p.delivery)}</div>
+      </div>
+      <div class="item-row-actions">
+        <button class="icon-btn" onclick="openProductModal(${CURRENT_SECTION_INDEX}, ${pi})" title="Edit">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+        <button class="icon-btn" onclick="moveProduct(${pi}, -1)" title="Up">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+        </button>
+        <button class="icon-btn" onclick="moveProduct(${pi}, 1)" title="Down">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <button class="icon-btn danger" onclick="removeProduct(${pi})" title="Delete">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+function moveProduct(i, dir) {
+  const arr = DATA.sections[CURRENT_SECTION_INDEX].products;
+  const j = i + dir;
+  if (j < 0 || j >= arr.length) return;
+  [arr[i], arr[j]] = [arr[j], arr[i]];
+  // Persist new order to DB (section_products.sort_order)
+  persistSectionProductOrder(DATA.sections[CURRENT_SECTION_INDEX]);
+  renderSectionEditor();
+}
+async function removeProduct(i) {
+  if (!confirm('Delete this product from this section?')) return;
+  const section = DATA.sections[CURRENT_SECTION_INDEX];
+  const product = section.products[i];
+  section.products.splice(i, 1);
+  // Remove the section_products link in DB (does NOT delete the product itself —
+  // it may belong to other sections)
+  try {
+    await removeProductFromSection(section, product);
+    toast('Removed');
+  } catch (e) {
+    console.error(e);
+    toast('Delete failed: ' + e.message, true);
+  }
+  renderSectionEditor();
+}
+async function addSection() {
+  const slug = 'section-' + Date.now();
+  const newSection = {
+    id: slug, title: 'New Section', subtitle: 'Subtitle here', title_href: '#', products: []
+  };
+  try {
+    const { error } = await window.sb.from('product_sections').insert({
+      slug,
+      title: newSection.title,
+      subtitle: newSection.subtitle,
+      view_all_href: newSection.title_href,
+      sort_order: DATA.sections.length + 1,
+      is_visible: true
+    });
+    if (error) throw error;
+    DATA.sections.push(newSection);
+    CURRENT_SECTION_INDEX = DATA.sections.length - 1;
+    toast('Section added');
+    renderSections();
+  } catch (e) {
+    console.error(e);
+    toast('Add failed: ' + e.message, true);
+  }
+}
+async function removeSection(i) {
+  if (!confirm('Delete this entire section? Products will remain in DB but will be removed from this section. This cannot be undone.')) return;
+  const slug = DATA.sections[i].id;
+  try {
+    const { error } = await window.sb.from('product_sections').delete().eq('slug', slug);
+    if (error) throw error;
+    DATA.sections.splice(i, 1);
+    CURRENT_SECTION_INDEX = Math.max(0, CURRENT_SECTION_INDEX - 1);
+    toast('Section deleted');
+    renderSections();
+  } catch (e) {
+    console.error(e);
+    toast('Delete failed: ' + e.message, true);
+  }
+}
+
+/* Save current section's metadata (title/subtitle/title_href) to DB.
+   Called when user edits the section info fields. */
+async function saveCurrentSectionInfo() {
+  const s = DATA.sections[CURRENT_SECTION_INDEX];
+  if (!s) return;
+  try {
+    const { error } = await window.sb
+      .from('product_sections')
+      .update({
+        title:         s.title,
+        subtitle:      s.subtitle,
+        view_all_href: s.title_href
+      })
+      .eq('slug', s.id);
+    if (error) throw error;
+    toast('Section info saved');
+  } catch (e) {
+    console.error(e);
+    toast('Save failed: ' + e.message, true);
+  }
+}
+
+/* Update section_products.sort_order for all products in the section. */
+async function persistSectionProductOrder(section) {
+  try {
+    // 1. Get section's UUID from its slug
+    const { data: sec, error: sErr } = await window.sb
+      .from('product_sections').select('id').eq('slug', section.id).maybeSingle();
+    if (sErr || !sec) throw sErr || new Error('section not found');
+
+    // 2. For each product in current order, look up product UUID by slug,
+    //    then update sort_order in section_products
+    for (let idx = 0; idx < section.products.length; idx++) {
+      const p = section.products[idx];
+      const productSlug = nameToSlug(p.name);
+      const { data: prod } = await window.sb
+        .from('products').select('id').eq('slug', productSlug).maybeSingle();
+      if (!prod) continue;
+      await window.sb
+        .from('section_products')
+        .update({ sort_order: idx + 1 })
+        .eq('section_id', sec.id)
+        .eq('product_id', prod.id);
+    }
+    toast('Order saved');
+  } catch (e) {
+    console.error('persistSectionProductOrder:', e);
+    toast('Save order failed', true);
+  }
+}
+
+async function removeProductFromSection(section, product) {
+  const { data: sec } = await window.sb
+    .from('product_sections').select('id').eq('slug', section.id).maybeSingle();
+  const { data: prod } = await window.sb
+    .from('products').select('id').eq('slug', nameToSlug(product.name)).maybeSingle();
+  if (!sec || !prod) return;
+  await window.sb
+    .from('section_products')
+    .delete()
+    .eq('section_id', sec.id)
+    .eq('product_id', prod.id);
+}
+
+function nameToSlug(name) {
+  return String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+/* Product modal */
+const THEMES = ['chatgpt','spotify','netflix','youtube','adobe','discord','canva','figma','midjourney','notion','steam','apple'];
+function openProductModal(secIdx, prodIdx) {
+  const isNew = prodIdx === -1;
+  const p = isNew
+    ? {name:'',desc:'',theme:'chatgpt',logo_class:'gpt',logo:'?',price:'0.00',orders:'0',completion:'100',like:'100',delivery:'Instant',seller:'',color:'#3AABFF'}
+    : JSON.parse(JSON.stringify(DATA.sections[secIdx].products[prodIdx]));
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-head">
+      <div class="modal-title">${isNew ? 'Add product' : 'Edit product'}</div>
+      <button class="icon-btn" onclick="closeModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Product name</label>
+        <input type="text" id="m-name" value="${escapeAttr(p.name)}" />
+      </div>
+      <div class="field">
+        <label class="field-label">Price (USD)</label>
+        <input type="text" id="m-price" value="${escapeAttr(p.price)}" />
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Description</label>
+      <input type="text" id="m-desc" value="${escapeAttr(p.desc)}" />
+    </div>
+
+    <div class="field-row-3">
+      <div class="field">
+        <label class="field-label">Theme (header gradient)</label>
+        <select id="m-theme">
+          ${THEMES.map(t => `<option value="${t}" ${t === p.theme ? 'selected' : ''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Logo character</label>
+        <input type="text" id="m-logo" value="${escapeAttr(p.logo)}" maxlength="2" />
+        <div class="field-hint">Single character or symbol</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Logo class</label>
+        <select id="m-logo-class">
+          ${['gpt','sp','nf','yt','ad','dc','cv','fg','mj','nt','st','ap'].map(c => `<option value="${c}" ${c === p.logo_class ? 'selected' : ''}>${c}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <div class="field-row-4">
+      <div class="field">
+        <label class="field-label">Orders</label>
+        <input type="text" id="m-orders" value="${escapeAttr(p.orders)}" />
+      </div>
+      <div class="field">
+        <label class="field-label">Completion %</label>
+        <input type="text" id="m-completion" value="${escapeAttr(p.completion)}" />
+      </div>
+      <div class="field">
+        <label class="field-label">Like %</label>
+        <input type="text" id="m-like" value="${escapeAttr(p.like)}" />
+      </div>
+      <div class="field">
+        <label class="field-label">Delivery</label>
+        <input type="text" id="m-delivery" value="${escapeAttr(p.delivery)}" />
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Seller name</label>
+        <input type="text" id="m-seller" value="${escapeAttr(p.seller)}" />
+      </div>
+      <div class="field">
+        <label class="field-label">Seller avatar color</label>
+        <input type="color" id="m-color" value="${escapeAttr(p.color)}" style="height: 38px; padding: 4px;" />
+      </div>
+    </div>
+
+    <div class="actions-bar">
+      <button class="btn btn-primary" onclick="saveProductModal(${secIdx}, ${prodIdx})">${isNew ? 'Add product' : 'Save changes'}</button>
+      <button class="btn" onclick="closeModal()">Cancel</button>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+async function saveProductModal(secIdx, prodIdx) {
+  const p = {
+    name:       document.getElementById('m-name').value.trim(),
+    desc:       document.getElementById('m-desc').value,
+    theme:      document.getElementById('m-theme').value,
+    logo:       document.getElementById('m-logo').value,
+    logo_class: document.getElementById('m-logo-class').value,
+    price:      document.getElementById('m-price').value,
+    orders:     document.getElementById('m-orders').value,
+    completion: document.getElementById('m-completion').value,
+    like:       document.getElementById('m-like').value,
+    delivery:   document.getElementById('m-delivery').value,
+    seller:     document.getElementById('m-seller').value.trim(),
+    color:      document.getElementById('m-color').value
+  };
+  if (!p.name) { toast('Product name is required', true); return; }
+  if (!p.seller) { toast('Seller name is required', true); return; }
+
+  try {
+    // 1. Find or create the seller (by name)
+    const sellerSlug = nameToSlug(p.seller);
+    let { data: seller } = await window.sb
+      .from('sellers').select('id').eq('slug', sellerSlug).maybeSingle();
+    if (!seller) {
+      const { data: newSeller, error: sErr } = await window.sb
+        .from('sellers')
+        .insert({ slug: sellerSlug, name: p.seller, avatar_color: p.color, is_verified: true })
+        .select('id').single();
+      if (sErr) throw sErr;
+      seller = newSeller;
+    } else {
+      // Update color if it changed
+      await window.sb.from('sellers').update({ avatar_color: p.color }).eq('id', seller.id);
+    }
+
+    // 2. Upsert the product (find by slug, update if exists, insert if not)
+    const productSlug = nameToSlug(p.name);
+    const productPayload = {
+      slug:            productSlug,
+      name:            p.name,
+      description:     p.desc,
+      base_price:      parseFloat(p.price) || 0,
+      seller_id:       seller.id,
+      theme:           p.theme,
+      logo_class:      p.logo_class,
+      logo_char:       p.logo,
+      total_orders:    parseInt(String(p.orders).replace(/,/g, ''), 10) || 0,
+      completion_rate: parseFloat(p.completion) || 100,
+      like_rate:       parseFloat(p.like) || 99,
+      delivery_time:   p.delivery,
+      is_visible:      true
+    };
+    const { data: upserted, error: pErr } = await window.sb
+      .from('products')
+      .upsert(productPayload, { onConflict: 'slug' })
+      .select('id').single();
+    if (pErr) throw pErr;
+
+    // 3. Link product to current section if not already linked
+    const section = DATA.sections[secIdx];
+    const { data: sec } = await window.sb
+      .from('product_sections').select('id').eq('slug', section.id).maybeSingle();
+    if (sec) {
+      // Use upsert to create-or-leave-alone the link
+      const sortOrder = (prodIdx === -1) ? section.products.length + 1 : prodIdx + 1;
+      await window.sb
+        .from('section_products')
+        .upsert(
+          { section_id: sec.id, product_id: upserted.id, sort_order: sortOrder },
+          { onConflict: 'section_id,product_id' }
+        );
+    }
+
+    // 4. Update local DATA so UI reflects change
+    if (prodIdx === -1) DATA.sections[secIdx].products.push(p);
+    else DATA.sections[secIdx].products[prodIdx] = p;
+
+    toast('Product saved');
+    closeModal();
+    renderSectionEditor();
+  } catch (e) {
+    console.error('saveProductModal:', e);
+    toast('Save failed: ' + (e.message || 'unknown'), true);
+  }
+}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+/* ---------- FAQ ---------- */
+function renderFaq() {
+  document.getElementById('faq-title').value = DATA.faq.title;
+  document.getElementById('faq-subtitle').value = DATA.faq.subtitle;
+  renderFaqList();
+}
+function renderFaqList() {
+  document.getElementById('faq-list').innerHTML = DATA.faq.items.map((it, i) => `
+    <div class="card-block" style="background: var(--bg-input); padding: 16px 18px; margin-bottom: 10px;">
+      <div style="display: flex; gap: 10px; align-items: start; margin-bottom: 8px;">
+        <div class="item-row-thumb" style="background: var(--bg-elevated); color: var(--text-muted); font-size: 13px; width: 28px; height: 28px; border-radius: 6px;">${i + 1}</div>
+        <div style="flex:1;">
+          <div class="field" style="margin-bottom: 8px;">
+            <input type="text" value="${escapeAttr(it.q)}" oninput="DATA.faq.items[${i}].q=this.value" placeholder="Question" />
+          </div>
+          <div class="field" style="margin-bottom: 0;">
+            <textarea rows="2" oninput="DATA.faq.items[${i}].a=this.value" placeholder="Answer">${escapeText(it.a)}</textarea>
+          </div>
+        </div>
+        <div class="item-row-actions">
+          <button class="icon-btn" onclick="moveFaq(${i}, -1)" title="Up">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+          </button>
+          <button class="icon-btn" onclick="moveFaq(${i}, 1)" title="Down">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <button class="icon-btn danger" onclick="removeFaq(${i})" title="Delete">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+          </button>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <button class="btn btn-sm btn-primary" onclick="saveAllFaqItems()">Save</button>
+      </div>
+    </div>`).join('');
+}
+async function moveFaq(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= DATA.faq.items.length) return;
+  [DATA.faq.items[i], DATA.faq.items[j]] = [DATA.faq.items[j], DATA.faq.items[i]];
+  renderFaqList();
+  // Persist new order to DB
+  await persistFaqOrder();
+}
+async function removeFaq(i) {
+  if (!confirm('Delete this question?')) return;
+  const item = DATA.faq.items[i];
+  DATA.faq.items.splice(i, 1);
+  // Find by question text + delete from DB
+  try {
+    await window.sb.from('faq_items').delete().eq('question', item.q);
+    toast('Deleted');
+  } catch (e) {
+    console.error(e);
+    toast('Delete failed: ' + e.message, true);
+  }
+  renderFaqList();
+}
+async function addFaq() {
+  const newItem = { q: 'New question?', a: 'Answer here.' };
+  try {
+    const { error } = await window.sb.from('faq_items').insert({
+      question: newItem.q,
+      answer: newItem.a,
+      sort_order: DATA.faq.items.length + 1,
+      is_visible: true
+    });
+    if (error) throw error;
+    DATA.faq.items.push(newItem);
+    toast('FAQ added');
+    navigate('faq');
+  } catch (e) {
+    console.error(e);
+    toast('Add failed: ' + e.message, true);
+  }
+}
+async function saveFaqHeader() {
+  // FAQ header (title/subtitle) is currently not stored in DB — it's static.
+  // We update the local DATA only. To persist, would need a separate settings table.
+  DATA.faq.title = document.getElementById('faq-title').value;
+  DATA.faq.subtitle = document.getElementById('faq-subtitle').value;
+  toast('Header saved (local only — header text is currently hardcoded)');
+}
+
+/* Save all FAQ items: simplest reliable approach is delete-all + insert-all.
+   For a list of ~10-50 items this is fast and bulletproof. */
+async function saveAllFaqItems() {
+  try {
+    await window.sb.from('faq_items').delete().gte('sort_order', 0);
+    if (DATA.faq.items.length > 0) {
+      const rows = DATA.faq.items.map((it, idx) => ({
+        question: it.q,
+        answer: it.a,
+        sort_order: idx + 1,
+        is_visible: true
+      }));
+      const { error } = await window.sb.from('faq_items').insert(rows);
+      if (error) throw error;
+    }
+    toast('All FAQ items saved');
+  } catch (e) {
+    console.error(e);
+    toast('Save failed: ' + e.message, true);
+  }
+}
+
+async function persistFaqOrder() {
+  // Same approach: delete + reinsert ensures order is canonical
+  return saveAllFaqItems();
+}
+
+/* ---------- SETTINGS ---------- */
+function exportData() {
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'nexus-site-data-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Downloaded');
+}
+function importData(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const obj = JSON.parse(e.target.result);
+      if (!obj.logo || !obj.sub_nav || !obj.hero || !obj.sections || !obj.faq) {
+        throw new Error('Invalid structure');
+      }
+      if (!confirm('Import this file? Note: this only updates the local view. To push it to the database, save each section individually after import.')) return;
+      DATA = obj;
+      navigate('dashboard');
+      toast('Imported to local view. Save each section to push to DB.');
+    } catch (err) {
+      toast('Invalid file: ' + err.message, true);
+    }
+  };
+  reader.readAsText(file);
+  ev.target.value = '';
+}
+function resetData() {
+  if (!confirm('Reset all local edits and reload from database?')) return;
+  // Reload fresh data from Supabase
+  location.reload();
+}
+
+/* ---------- HELPERS ---------- */
+function escapeAttr(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeText(s) {
+  return String(s == null ? '' : s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+
+/* ---------- BOOT ---------- */
+SITE_DATA_READY.then(() => {
+  // Clone so admin's edits don't mutate the cached SITE_DATA
+  DATA = JSON.parse(JSON.stringify(SITE_DATA));
+  renderDashboard();
+});
+</script>
+
+</body>
+</html>
