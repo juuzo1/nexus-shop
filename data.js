@@ -208,6 +208,22 @@ async function loadSections() {
   function normalize(p) {
     // Use first image as cover if present, otherwise fall back to legacy theme/logo
     const cover = (p.images && p.images.length) ? p.images[0] : null;
+
+    // Resolve seller name: prefer the actual owner (profile) over the legacy sellers row
+    let sellerName = 'Seller';
+    let sellerColor = '#3AABFF';
+    if (p.profiles && p.profiles.display_name) {
+      sellerName = p.profiles.display_name;
+      // Generate a stable color from the user id (mock until we add avatar_color to profiles)
+      sellerColor = '#3AABFF';
+    } else if (p.sellers && p.sellers.name) {
+      sellerName = p.sellers.name;
+      sellerColor = p.sellers.avatar_color || '#3AABFF';
+    }
+
+    const ordersCount = Number(p.total_orders || 0);
+    const isNew = ordersCount === 0;
+
     return {
       name:        p.name,
       desc:        p.description || '',
@@ -216,13 +232,14 @@ async function loadSections() {
       logo:        p.logo_char || (p.name || '?').charAt(0).toUpperCase(),
       cover_url:   cover,
       price:       Number(p.base_price).toFixed(2),
-      orders:      formatNumber(p.total_orders),
+      orders:      formatNumber(ordersCount),
       completion:  Number(p.completion_rate).toFixed(0),
       like:        Number(p.like_rate).toFixed(2),
       delivery:    p.delivery_time,
-      seller:      p.sellers ? p.sellers.name : 'Seller',
-      color:       p.sellers ? p.sellers.avatar_color : '#3AABFF',
-      slug:        p.slug
+      seller:      sellerName,
+      color:       sellerColor,
+      slug:        p.slug,
+      is_new:      isNew
     };
   }
 
@@ -230,11 +247,13 @@ async function loadSections() {
     id, slug, name, description, base_price,
     theme, logo_class, logo_char, images,
     total_orders, completion_rate, like_rate, delivery_time, is_featured, created_at,
+    owner_user_id,
     sellers ( name, avatar_color )
   `;
 
   async function queryProducts(orderCol, ascending, filter) {
-    let q = sb.from('products').select(PRODUCT_SELECT).eq('is_visible', true);
+    let q = sb.from('products').select(PRODUCT_SELECT);
+    // status='approved' is enforced by RLS in public_read policy
     if (filter) q = filter(q);
     return withTimeout(
       q.order(orderCol, { ascending }).limit(12),
@@ -251,15 +270,42 @@ async function loadSections() {
       queryProducts('created_at', false, q => q.eq('is_featured', true)).catch(e => ({ data: null, error: e }))
     ]);
 
+    // Collect all owner user ids and fetch their profiles in one query
+    const allRows = [bestRes, trendingRes, newRes, featuredRes].flatMap(r => (r && r.data) || []);
+    const ownerIds = [...new Set(allRows.map(r => r.owner_user_id).filter(Boolean))];
+    const profileMap = {};
+    if (ownerIds.length > 0) {
+      try {
+        const { data: profs } = await sb
+          .from('profiles')
+          .select('id, display_name, avatar_url')
+          .in('id', ownerIds);
+        (profs || []).forEach(p => { profileMap[p.id] = p; });
+      } catch (e) {
+        console.warn('[data.js] profile lookup failed', e);
+      }
+    }
+    // Attach profile to each product row before normalization
+    [bestRes, trendingRes, newRes, featuredRes].forEach(res => {
+      if (res && res.data) {
+        res.data.forEach(p => {
+          if (p.owner_user_id && profileMap[p.owner_user_id]) {
+            p.profiles = profileMap[p.owner_user_id];
+          }
+        });
+      }
+    });
+
     function buildSection(slug, title, subtitle, res) {
       const rows = (res && res.data) || [];
       const products = rows.map(normalize);
+      // No fallback when DB is empty — show genuine empty state
       return {
         id: slug,
         title,
         subtitle,
         title_href: '#',
-        products: products.length ? products : FALLBACK_PRODUCTS
+        products: products
       };
     }
 

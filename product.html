@@ -2016,7 +2016,7 @@
 
       <div class="nav-search-wrap">
         <div class="nav-search">
-        <input type="text" placeholder="What are you looking for ?" />
+        <input type="search" placeholder="What are you looking for ?" autocomplete="off" name="nx-search" />
         <div class="nav-search-divider"></div>
         <button class="nav-search-cat" id="cat-trigger" aria-haspopup="true" aria-expanded="false">
           All categories
@@ -2121,19 +2121,23 @@
               </div>
               <div class="auth-divider"></div>
               <div class="auth-menu">
-                <a class="auth-menu-item" href="#">
+                <a class="auth-menu-item" href="profile.html">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                   Profile
                 </a>
-                <a class="auth-menu-item" href="#">
+                <a class="auth-menu-item" href="dashboard.html">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                  Dashboard
+                </a>
+                <a class="auth-menu-item" href="orders.html">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg>
                   Order History
                 </a>
-                <a class="auth-menu-item" href="#">
+                <a class="auth-menu-item" href="wishlist.html">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
                   Wishlist
                 </a>
-                <a class="auth-menu-item" href="#">
+                <a class="auth-menu-item" href="settings.html">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                   Settings
                 </a>
@@ -2404,13 +2408,14 @@ async function fetchProductFromDb(slug) {
     // Fetch tiers separately so we control ordering
     const { data: tiers } = await window.sb
       .from('pricing_tiers')
-      .select('duration_id, duration_label, price, sort_order')
+      .select('id, duration_id, duration_label, price, sort_order')
       .eq('product_id', data.id)
       .order('sort_order', { ascending: true });
 
     const seller = data.sellers || {};
     const product = {
       id:           data.id,
+      db_id:        data.id,
       slug:         data.slug,
       name:         data.name,
       desc:         data.description || '',
@@ -2429,10 +2434,11 @@ async function fetchProductFromDb(slug) {
       seller_verified: !!seller.is_verified,
       seller_orders:   seller.total_orders || 0
     };
-    // Map tiers to TIERS shape used by renderDurations
+    // Map tiers to TIERS shape used by renderDurations (db_id = real UUID)
     if (tiers && tiers.length) {
       window.__loadedTiers = tiers.map(t => ({
         id: t.duration_id || ('t' + (t.sort_order || 0)),
+        db_id: t.id,
         label: t.duration_label,
         price: Number(t.price)
       }));
@@ -3719,20 +3725,19 @@ SITE_DATA_READY.then(boot);
 <script>
 /* Wallet coin dropdown — click balance area to open. Search + select coin. */
 (function() {
-  const COINS = [
-    { code:'USDT', name:'USD Tether',   color:'#26A17B', letter:'T', amount:'0.05560468' },
-    { code:'BTC',  name:'Bitcoin',      color:'#F7931A', letter:'B', amount:'0.00000000' },
-    { code:'ETH',  name:'Ethereum',     color:'#627EEA', letter:'E', amount:'0.00000000' },
-    { code:'LTC',  name:'Litecoin',     color:'#345D9D', letter:'Ł', amount:'0.00000000' },
-    { code:'SOL',  name:'Solana',       color:'#9945FF', letter:'S', amount:'0.00000028' },
-    { code:'DOGE', name:'Dogecoin',     color:'#C2A633', letter:'Ð', amount:'0.00000000' },
-    { code:'BCH',  name:'Bitcoin Cash', color:'#0AC18E', letter:'B', amount:'0.00000000' },
-    { code:'XRP',  name:'XRP',          color:'#23292F', letter:'X', amount:'0.00000000' },
-    { code:'TRX',  name:'TRON',         color:'#E50915', letter:'T', amount:'0.00000000' },
-    { code:'ADA',  name:'Cardano',      color:'#0033AD', letter:'A', amount:'0.00000000' },
-    { code:'MATIC',name:'Polygon',      color:'#8247E5', letter:'M', amount:'0.00000000' },
-    { code:'BNB',  name:'BNB',          color:'#F3BA2F', letter:'B', amount:'0.00000000' }
-  ];
+  // Coin metadata. Stablecoins only (1 USDT = 1 USDC = 1 USD).
+  const COIN_META = {
+    USDT: { name: 'USD Tether', color: '#26A17B', letter: 'T' },
+    USDC: { name: 'USD Coin',   color: '#2775CA', letter: 'C' }
+  };
+  const SUPPORTED_COINS = ['USDT', 'USDC'];
+  let COINS = SUPPORTED_COINS.map(code => ({
+    code,
+    name: COIN_META[code].name,
+    color: COIN_META[code].color,
+    letter: COIN_META[code].letter,
+    amount: '0.00000000'
+  }));
 
   const wrap     = document.getElementById('wallet-btn');
   const trigger  = document.getElementById('wallet-trigger');
@@ -3744,11 +3749,39 @@ SITE_DATA_READY.then(boot);
   const navCoin    = document.getElementById('wallet-nav-coin');
   if (!wrap || !trigger || !dropdown || !listEl) return;
 
-  // Selected coin (default USDT). Show shorter version on the navbar.
   let selectedCode = 'USDT';
 
+  async function loadBalances() {
+    if (!window.sb) return;
+    try {
+      const { data: { user } } = await window.sb.auth.getUser();
+      if (!user) return;
+      const { data, error } = await window.sb
+        .from('wallets')
+        .select('coin, balance')
+        .eq('user_id', user.id);
+      if (error) {
+        console.warn('[wallet] balance fetch failed', error);
+        return;
+      }
+      const map = {};
+      (data || []).forEach(r => { map[r.coin] = r.balance; });
+      COINS = SUPPORTED_COINS.map(code => ({
+        code,
+        name: COIN_META[code].name,
+        color: COIN_META[code].color,
+        letter: COIN_META[code].letter,
+        amount: Number(map[code] || 0).toFixed(8)
+      }));
+      paintNav();
+      paintList(searchEl ? searchEl.value : '');
+    } catch (e) {
+      console.warn('[wallet] load failed', e);
+    }
+  }
+  window.refreshWalletBalances = loadBalances;
+
   function shortBalance(amt) {
-    // Trim trailing zeros down to 4 decimals max
     const n = parseFloat(amt);
     if (n === 0) return '0.0000';
     return n.toFixed(4);
@@ -3766,21 +3799,72 @@ SITE_DATA_READY.then(boot);
     const filtered = q
       ? COINS.filter(c => c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q))
       : COINS;
-    if (filtered.length === 0) {
-      listEl.innerHTML = '<div class="wallet-coin-empty">No currencies found</div>';
-      return;
-    }
-    listEl.innerHTML = filtered.map(c => `
-      <div class="wallet-coin-item${c.code === selectedCode ? ' active' : ''}" data-code="${c.code}">
-        <span class="wallet-coin-item-balance">${c.amount}</span>
-        <span class="coin-icon" style="background:${c.color};">${c.letter}</span>
-        <span class="wallet-coin-item-name">${c.code}</span>
+    const itemsHtml = filtered.length === 0
+      ? '<div class="wallet-coin-empty">No currencies found</div>'
+      : filtered.map(c => `
+        <div class="wallet-coin-item${c.code === selectedCode ? ' active' : ''}" data-code="${c.code}">
+          <span class="wallet-coin-item-balance">${c.amount}</span>
+          <span class="coin-icon" style="background:${c.color};">${c.letter}</span>
+          <span class="wallet-coin-item-name">${c.code}</span>
+        </div>
+      `).join('');
+
+    const demoPanel = `
+      <div style="border-top:1px solid var(--border-default); padding:10px 12px; display:flex; gap:6px; align-items:center;">
+        <input id="wallet-demo-amount" type="number" min="1" step="any" placeholder="Demo amount" value="100"
+          style="flex:1; background:var(--bg-input); border:1px solid var(--border-default); border-radius:7px; padding:7px 10px; color:var(--text-primary); font-size:12.5px; outline:none; font-family:inherit;">
+        <button id="wallet-demo-topup" type="button"
+          style="background:var(--gradient-primary); color:white; border:none; border-radius:7px; padding:7px 12px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; white-space:nowrap;">
+          + Demo top-up
+        </button>
       </div>
-    `).join('');
+    `;
+    listEl.innerHTML = itemsHtml + demoPanel;
+
+    const btn = document.getElementById('wallet-demo-topup');
+    if (btn) {
+      btn.addEventListener('click', async () => {
+        const amount = parseFloat(document.getElementById('wallet-demo-amount').value);
+        if (!amount || amount <= 0) { alert('Enter a valid amount'); return; }
+        if (!window.sb) { alert('Database not connected'); return; }
+        const { data: { user } } = await window.sb.auth.getUser();
+        if (!user) { alert('Please log in first'); return; }
+        btn.disabled = true; btn.textContent = '...';
+        try {
+          const { error } = await window.sb.rpc('demo_topup', {
+            p_coin: selectedCode,
+            p_amount: amount
+          });
+          if (error) throw error;
+          await loadBalances();
+        } catch (e) {
+          alert('Top-up failed: ' + (e.message || e));
+        } finally {
+          btn.disabled = false; btn.textContent = '+ Demo top-up';
+        }
+      });
+    }
   }
 
   paintNav();
   paintList('');
+  if (window.sb) loadBalances();
+  else {
+    const t = setInterval(() => {
+      if (window.sb) {
+        clearInterval(t);
+        loadBalances();
+      }
+    }, 200);
+    setTimeout(() => clearInterval(t), 5000);
+  }
+  if (window.sb && window.sb.auth) {
+    try {
+      window.sb.auth.onAuthStateChange((_event) => {
+        loadBalances();
+      });
+    } catch (e) {}
+  }
 
   // Move dropdown to <body> to escape navbar's stacking context.
   if (dropdown.parentElement !== document.body) {
@@ -3896,10 +3980,9 @@ SITE_DATA_READY.then(boot);
     return items;
   }
 
-  document.addEventListener('click', e => {
+  document.addEventListener('click', async e => {
     if (e.target.closest('#btn-buy-now')) {
-      addCurrentToCart();
-      window.location.href = 'cart.html';
+      await handleBuyNow();
     } else if (e.target.closest('#btn-add-to-cart')) {
       const items = addCurrentToCart();
       if (items) {
@@ -3913,6 +3996,122 @@ SITE_DATA_READY.then(boot);
       window.location.href = 'cart.html';
     }
   });
+
+  async function handleBuyNow() {
+    const product = window.__currentProduct;
+    if (!product || !product.db_id) {
+      alert('Product not loaded yet');
+      return;
+    }
+    if (!window.sb) { alert('Database not connected'); return; }
+    const { data: { user } } = await window.sb.auth.getUser();
+    if (!user) {
+      alert('Please log in to buy');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    // Pick current tier + qty from page state
+    const tier = (typeof CURRENT_TIER !== 'undefined' && CURRENT_TIER) ? CURRENT_TIER : null;
+    const qty  = (typeof CURRENT_QTY  !== 'undefined' && CURRENT_QTY)  ? CURRENT_QTY  : 1;
+    const tierUuid = tier ? tier.db_id : null;
+    const unitPrice = tier ? Number(tier.price) : Number(product.price || 0);
+    const totalUsd = unitPrice * qty;
+
+    // Fetch user's USDT/USDC balance
+    const { data: wallets } = await window.sb
+      .from('wallets')
+      .select('coin, balance')
+      .eq('user_id', user.id);
+    const balanceMap = {};
+    (wallets || []).forEach(w => { balanceMap[w.coin] = Number(w.balance); });
+
+    openCheckoutModalProduct({
+      totalUsd,
+      productName: product.name,
+      tierLabel: tier ? tier.label : 'Base',
+      qty,
+      usdtBal: balanceMap.USDT || 0,
+      usdcBal: balanceMap.USDC || 0,
+      onConfirm: async (coin) => {
+        try {
+          const { error } = await window.sb.rpc('place_order', {
+            p_product_id: product.db_id,
+            p_pricing_tier_id: tierUuid,
+            p_qty: qty,
+            p_coin: coin
+          });
+          if (error) throw error;
+          if (typeof window.refreshWalletBalances === 'function') window.refreshWalletBalances();
+          window.location.href = 'orders.html';
+        } catch (e) {
+          alert('Order failed: ' + (e.message || e));
+        }
+      }
+    });
+  }
+
+  // Inline checkout modal (similar to cart's, but for single product)
+  function openCheckoutModalProduct({ totalUsd, productName, tierLabel, qty, usdtBal, usdcBal, onConfirm }) {
+    const existing = document.getElementById('checkout-modal');
+    if (existing) existing.remove();
+
+    const usdtOk = usdtBal >= totalUsd;
+    const usdcOk = usdcBal >= totalUsd;
+
+    const modal = document.createElement('div');
+    modal.id = 'checkout-modal';
+    modal.style.cssText = 'position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:20px;';
+    modal.innerHTML = `
+      <div style="background:#131B2D; border:1px solid #1F2937; border-radius:14px; padding:28px; width:100%; max-width:440px; box-shadow:0 24px 64px rgba(0,0,0,0.6);">
+        <h2 style="font-size:20px; font-weight:700; color:#fff; margin-bottom:6px;">Confirm purchase</h2>
+        <p style="font-size:13px; color:#9CA3AF; margin-bottom:18px;">${productName} · ${tierLabel} × ${qty} · <strong style="color:#fff;font-family:'Space Grotesk',sans-serif;">$${totalUsd.toFixed(2)}</strong></p>
+
+        <div style="font-size:12px; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px;">Choose payment method</div>
+
+        <label style="display:flex; align-items:center; gap:12px; padding:12px 14px; background:#0E1524; border:2px solid ${usdtOk?'#1F2937':'rgba(255,58,110,0.3)'}; border-radius:10px; cursor:${usdtOk?'pointer':'not-allowed'}; opacity:${usdtOk?'1':'0.5'}; margin-bottom:8px;">
+          <input type="radio" name="co-coin" value="USDT" ${usdtOk?'checked':'disabled'} style="accent-color:#3AABFF;">
+          <div style="width:30px;height:30px;border-radius:50%;background:#26A17B;display:grid;place-items:center;color:white;font-weight:700;">T</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;color:#fff;">USDT</div>
+            <div style="font-size:12px;color:#9CA3AF;">Balance: ${usdtBal.toFixed(2)} ${usdtOk ? '' : '<span style="color:#ff3a6e">· Insufficient</span>'}</div>
+          </div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#fff;">$${totalUsd.toFixed(2)}</div>
+        </label>
+
+        <label style="display:flex; align-items:center; gap:12px; padding:12px 14px; background:#0E1524; border:2px solid ${usdcOk?'#1F2937':'rgba(255,58,110,0.3)'}; border-radius:10px; cursor:${usdcOk?'pointer':'not-allowed'}; opacity:${usdcOk?'1':'0.5'}; margin-bottom:18px;">
+          <input type="radio" name="co-coin" value="USDC" ${usdcOk && !usdtOk?'checked':''} ${usdcOk?'':'disabled'} style="accent-color:#3AABFF;">
+          <div style="width:30px;height:30px;border-radius:50%;background:#2775CA;display:grid;place-items:center;color:white;font-weight:700;">C</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;color:#fff;">USDC</div>
+            <div style="font-size:12px;color:#9CA3AF;">Balance: ${usdcBal.toFixed(2)} ${usdcOk ? '' : '<span style="color:#ff3a6e">· Insufficient</span>'}</div>
+          </div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#fff;">$${totalUsd.toFixed(2)}</div>
+        </label>
+
+        ${(!usdtOk && !usdcOk) ? '<div style="background:rgba(255,58,110,0.1);border:1px solid rgba(255,58,110,0.3);border-radius:8px;padding:10px 12px;color:#ff3a6e;font-size:12.5px;margin-bottom:14px;">Insufficient balance. Top up your wallet first.</div>' : ''}
+
+        <div style="display:flex; gap:8px;">
+          <button id="co-cancel" type="button" style="flex:1; background:#1A2436; border:1px solid #1F2937; color:#fff; padding:10px; border-radius:9px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;">Cancel</button>
+          <button id="co-confirm" type="button" ${(!usdtOk && !usdcOk)?'disabled':''} style="flex:2; background:linear-gradient(135deg,#3A7BD5,#3AABFF); border:none; color:#fff; padding:10px; border-radius:9px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; opacity:${(!usdtOk && !usdcOk)?'0.5':'1'};">Confirm &amp; pay</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    function close() { modal.remove(); document.body.style.overflow = ''; }
+    modal.querySelector('#co-cancel').addEventListener('click', close);
+    modal.addEventListener('click', e => { if (e.target === modal) close(); });
+    modal.querySelector('#co-confirm').addEventListener('click', async () => {
+      const picked = modal.querySelector('input[name="co-coin"]:checked');
+      if (!picked) { alert('Choose a coin'); return; }
+      const btn = modal.querySelector('#co-confirm');
+      btn.disabled = true; btn.textContent = 'Processing...';
+      try { await onConfirm(picked.value); }
+      finally { close(); }
+    });
+  }
 
   // Initial badge paint
   document.addEventListener('DOMContentLoaded', updateCartBadge);

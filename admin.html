@@ -270,6 +270,73 @@
   .btn:hover { border-color: var(--accent-blue); }
   .btn svg { width: 14px; height: 14px; }
 
+  /* Admin Orders */
+  .ord-filter {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    color: var(--text-secondary);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ord-filter:hover { border-color: var(--accent-blue); }
+  .ord-filter.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+  }
+  .ord-cnt {
+    background: rgba(255,255,255,0.12);
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .ord-filter.active .ord-cnt {
+    background: rgba(255,255,255,0.25);
+  }
+  #orders-table td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid var(--border-default); vertical-align: middle; }
+  #orders-table tbody tr:hover { background: rgba(58, 171, 255, 0.04); }
+  .ord-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .ord-status.in_escrow { background: rgba(58, 171, 255, 0.15); color: #3AABFF; }
+  .ord-status.delivered { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
+  .ord-status.completed { background: rgba(16, 185, 129, 0.15); color: #10B981; }
+  .ord-status.refunded { background: rgba(156, 163, 175, 0.15); color: #9CA3AF; }
+  .ord-status.cancelled { background: rgba(255, 58, 110, 0.15); color: #ff3a6e; }
+  .ord-status.disputed { background: rgba(245, 158, 11, 0.18); color: #F59E0B; }
+  .ord-action-btn {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    margin-left: 4px;
+  }
+  .ord-action-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+  .ord-action-btn.refund { color: #ff3a6e; border-color: rgba(255,58,110,0.3); }
+  .ord-action-btn.refund:hover { background: rgba(255,58,110,0.1); border-color: #ff3a6e; color: #ff3a6e; }
+  .ord-action-btn.release { color: #10B981; border-color: rgba(16,185,129,0.3); }
+  .ord-action-btn.release:hover { background: rgba(16,185,129,0.1); border-color: #10B981; color: #10B981; }
+
   .btn-primary {
     background: var(--gradient-primary);
     border-color: transparent;
@@ -520,6 +587,224 @@
 </head>
 <body>
 
+<!-- ============= ADMIN LOCK OVERLAY ============= -->
+<div id="admin-lock" style="position:fixed; inset:0; z-index:99999; background:#070B14; display:flex; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#131B2D; border:1px solid #1F2937; border-radius:16px; padding:40px 36px; width:100%; max-width:420px; box-shadow:0 24px 64px rgba(0,0,0,0.6);">
+
+    <div style="text-align:center; margin-bottom:28px;">
+      <div style="width:64px; height:64px; margin:0 auto 16px; border-radius:14px; background:linear-gradient(135deg, #3A7BD5, #3AABFF); display:grid; place-items:center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h1 style="font-size:22px; font-weight:700; color:#fff; margin-bottom:6px;">Admin access</h1>
+      <p style="font-size:13.5px; color:#9CA3AF;">Sign in with your admin account.</p>
+    </div>
+
+    <div id="lock-banned" style="display:none; background:rgba(255,58,110,0.1); border:1px solid rgba(255,58,110,0.3); border-radius:10px; padding:14px 16px; text-align:center; color:#ff3a6e; font-size:13.5px; margin-bottom:16px;">
+      <strong>Access denied.</strong><br>
+      Too many failed attempts. Clear browser data to retry.
+    </div>
+
+    <div id="lock-form" style="display:flex; flex-direction:column; gap:12px;">
+      <input id="admin-email-input" type="email" autocomplete="off" autofocus
+        placeholder="Admin email"
+        style="background:#0a0f1c; border:1px solid #1F2937; border-radius:9px; padding:12px 14px; color:#fff; font-size:14px; font-family:inherit; outline:none; width:100%; box-sizing:border-box;"
+      />
+      <input id="admin-pw-input" type="password" autocomplete="off"
+        placeholder="Password"
+        style="background:#0a0f1c; border:1px solid #1F2937; border-radius:9px; padding:12px 14px; color:#fff; font-size:14px; font-family:inherit; outline:none; width:100%; box-sizing:border-box;"
+      />
+      <div id="lock-error" style="display:none; color:#ff3a6e; font-size:12.5px; padding:2px;"></div>
+      <button id="admin-pw-submit"
+        style="background:linear-gradient(135deg, #3A7BD5, #3AABFF); color:#fff; border:none; border-radius:9px; padding:11px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:filter 0.15s;"
+        onmouseover="this.style.filter='brightness(1.12)'"
+        onmouseout="this.style.filter=''"
+      >
+        Sign in
+      </button>
+      <div id="lock-attempts" style="text-align:center; color:#6B7280; font-size:12px; margin-top:4px;"></div>
+    </div>
+
+    <div style="margin-top:24px; padding-top:18px; border-top:1px solid #1F2937; text-align:center;">
+      <a href="index.html" style="color:#6B7280; font-size:12.5px; text-decoration:none;">← Back to homepage</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== ADMIN LOCK (Supabase Auth + is_admin check) ===== */
+(function() {
+  const MAX_ATTEMPTS = 5;
+  const KEY_ATTEMPTS = 'nx_admin_attempts';
+  const KEY_BANNED   = 'nx_admin_banned';
+
+  function getAttempts() { return parseInt(localStorage.getItem(KEY_ATTEMPTS) || '0', 10); }
+  function setAttempts(n) { localStorage.setItem(KEY_ATTEMPTS, String(n)); }
+  function isBanned() { return localStorage.getItem(KEY_BANNED) === '1'; }
+  function setBanned() { localStorage.setItem(KEY_BANNED, '1'); }
+
+  const lockEl    = document.getElementById('admin-lock');
+  const formEl    = document.getElementById('lock-form');
+  const banEl     = document.getElementById('lock-banned');
+  const errEl     = document.getElementById('lock-error');
+  const attEl     = document.getElementById('lock-attempts');
+  const emailEl   = document.getElementById('admin-email-input');
+  const inputEl   = document.getElementById('admin-pw-input');
+  const submitEl  = document.getElementById('admin-pw-submit');
+
+  function unlock() {
+    lockEl.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function showBanned() {
+    formEl.style.display = 'none';
+    banEl.style.display = 'block';
+  }
+  function showAttempts() {
+    const n = getAttempts();
+    const left = MAX_ATTEMPTS - n;
+    if (n > 0 && left > 0) {
+      attEl.textContent = `${left} attempt${left>1?'s':''} remaining`;
+    } else {
+      attEl.textContent = '';
+    }
+  }
+  function showError(msg) {
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+  }
+
+  document.body.style.overflow = 'hidden';
+
+  if (isBanned()) {
+    showBanned();
+    return;
+  }
+
+  // Wait for sb client
+  function waitForSb() {
+    return new Promise(resolve => {
+      const start = Date.now();
+      (function check() {
+        if (window.sb) return resolve(true);
+        if (Date.now() - start > 5000) return resolve(false);
+        setTimeout(check, 50);
+      })();
+    });
+  }
+
+  async function checkExistingSession() {
+    const ok = await waitForSb();
+    if (!ok) return false;
+    try {
+      const { data: { user } } = await window.sb.auth.getUser();
+      if (!user) return false;
+      const { data: profile } = await window.sb
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (profile && profile.is_admin === true) {
+        unlock();
+        window.adminLogout = async function() {
+          await window.sb.auth.signOut();
+          location.reload();
+        };
+        return true;
+      }
+    } catch (e) {
+      console.warn('[admin lock] session check failed', e);
+    }
+    return false;
+  }
+
+  // Try to unlock from existing session immediately
+  checkExistingSession().then(unlocked => {
+    if (unlocked) return;
+    showAttempts();
+  });
+
+  async function trySignIn() {
+    if (isBanned()) { showBanned(); return; }
+    const ok = await waitForSb();
+    if (!ok) {
+      showError('Database not connected. Reload the page.');
+      return;
+    }
+
+    const email = (emailEl.value || '').trim();
+    const password = inputEl.value || '';
+    if (!email || !password) {
+      showError('Enter email and password.');
+      return;
+    }
+
+    submitEl.disabled = true;
+    submitEl.textContent = 'Signing in...';
+
+    let countWrong = false;
+    try {
+      const { data, error } = await window.sb.auth.signInWithPassword({ email, password });
+      if (error || !data || !data.user) {
+        countWrong = true;
+        showError('Invalid email or password.');
+      } else {
+        // Check is_admin
+        const { data: profile, error: pErr } = await window.sb
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', data.user.id)
+          .maybeSingle();
+        if (pErr) {
+          showError('Profile lookup failed: ' + pErr.message);
+          countWrong = true;
+        } else if (!profile || profile.is_admin !== true) {
+          // Sign out so the regular user session is not kept on admin device
+          await window.sb.auth.signOut();
+          showError('This account is not authorized for admin access.');
+          countWrong = true;
+        } else {
+          // SUCCESS
+          setAttempts(0);
+          unlock();
+          window.adminLogout = async function() {
+            await window.sb.auth.signOut();
+            location.reload();
+          };
+          return;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      showError('Sign in failed: ' + (e.message || e));
+      countWrong = true;
+    } finally {
+      submitEl.disabled = false;
+      submitEl.textContent = 'Sign in';
+    }
+
+    if (countWrong) {
+      const n = getAttempts() + 1;
+      setAttempts(n);
+      inputEl.value = '';
+      if (n >= MAX_ATTEMPTS) {
+        setBanned();
+        showBanned();
+        return;
+      }
+      const left = MAX_ATTEMPTS - n;
+      showError(`${errEl.textContent.replace(/\.$/, '')}. ${left} attempt${left>1?'s':''} remaining.`);
+      showAttempts();
+    }
+  }
+
+  submitEl.addEventListener('click', trySignIn);
+  emailEl.addEventListener('keydown', e => { if (e.key === 'Enter') inputEl.focus(); });
+  inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') trySignIn(); });
+})();
+</script>
+<!-- ============= /ADMIN LOCK ============= -->
+
+
 <div class="layout">
 
   <!-- SIDEBAR -->
@@ -556,6 +841,16 @@
       Products
     </a>
 
+    <a class="sidebar-link" data-page="pending">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Pending review <span id="admin-pending-badge" style="display:none; margin-left:auto; background:#FBBF24; color:#0a0e1a; font-size:10px; font-weight:800; padding:2px 7px; border-radius:999px;">0</span>
+    </a>
+
+    <a class="sidebar-link" data-page="orders">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Orders <span id="admin-disputed-badge" style="display:none; margin-left:auto; background:#F59E0B; color:#0a0e1a; font-size:10px; font-weight:800; padding:2px 7px; border-radius:999px;">0</span>
+    </a>
+
     <a class="sidebar-link" data-page="users">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Users
@@ -571,6 +866,10 @@
       <a class="sidebar-link" href="index.html" target="_blank">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
         View site
+      </a>
+      <a class="sidebar-link" href="#" onclick="event.preventDefault(); if(window.adminLogout) window.adminLogout();" style="color:#ff3a6e;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        Lock admin
       </a>
     </div>
   </aside>
@@ -810,6 +1109,88 @@
         </div>
         <div id="products-empty" style="padding: 40px; text-align: center; color: var(--text-muted); display: none;">
           No products yet. Click <strong>Add Product</strong> to create one.
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== PENDING REVIEW ========== -->
+    <div class="page" data-page-name="pending">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Pending review</div>
+          <div class="page-subtitle">User-submitted products waiting for approval</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="color: var(--text-muted); font-size: 13px;">Pending: <strong id="pending-count" style="color: #FBBF24;">0</strong></div>
+          <button class="btn" onclick="renderPending()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="card-block" style="padding: 0; overflow: hidden;">
+        <div id="pending-list"></div>
+        <div id="pending-empty" style="padding: 60px 24px; text-align: center; color: var(--text-muted); display: none;">
+          <div style="font-size: 40px; margin-bottom: 14px;">✓</div>
+          <h3 style="color: var(--text-primary); margin-bottom: 6px;">All caught up</h3>
+          <p style="font-size: 13px;">No products waiting for review.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ORDERS ========== -->
+    <div class="page" data-page-name="orders">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Orders</div>
+          <div class="page-subtitle">All marketplace transactions · Resolve disputes</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="color: var(--text-muted); font-size: 13px;">Total: <strong id="orders-count" style="color: var(--text-primary);">0</strong></div>
+          <button class="btn" onclick="renderAdminOrders()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
+        <button class="ord-filter active" data-status="all">All <span class="ord-cnt" id="ord-cnt-all">0</span></button>
+        <button class="ord-filter" data-status="in_escrow">In escrow <span class="ord-cnt" id="ord-cnt-in_escrow">0</span></button>
+        <button class="ord-filter" data-status="delivered">Delivered <span class="ord-cnt" id="ord-cnt-delivered">0</span></button>
+        <button class="ord-filter" data-status="completed">Completed <span class="ord-cnt" id="ord-cnt-completed">0</span></button>
+        <button class="ord-filter" data-status="refunded">Refunded <span class="ord-cnt" id="ord-cnt-refunded">0</span></button>
+        <button class="ord-filter" data-status="cancelled">Cancelled <span class="ord-cnt" id="ord-cnt-cancelled">0</span></button>
+        <button class="ord-filter" data-status="disputed">Disputed <span class="ord-cnt" id="ord-cnt-disputed">0</span></button>
+      </div>
+
+      <input id="orders-search" type="search" autocomplete="off" placeholder="Search by order number, buyer, seller, product..."
+        style="width:100%; padding:11px 14px; background:var(--bg-input); border:1px solid var(--border-default); border-radius:9px; color:var(--text-primary); font-size:13.5px; outline:none; font-family:inherit; margin-bottom:14px;">
+
+      <div class="card-block" style="padding: 0; overflow: hidden;">
+        <div style="overflow-x:auto;">
+          <table id="orders-table" style="width:100%; border-collapse:collapse; min-width:1100px;">
+            <thead>
+              <tr style="background:var(--bg-elevated); border-bottom:1px solid var(--border-default);">
+                <th style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Order #</th>
+                <th style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Date</th>
+                <th style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Buyer</th>
+                <th style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Seller</th>
+                <th style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Product</th>
+                <th style="text-align:right; padding:10px 14px; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Qty</th>
+                <th style="text-align:right; padding:10px 14px; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Amount</th>
+                <th style="text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Status</th>
+                <th style="text-align:right; padding:10px 14px; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody"></tbody>
+          </table>
+        </div>
+        <div id="orders-empty" style="padding: 60px 24px; text-align: center; color: var(--text-muted); display:none;">
+          <h3 style="color: var(--text-primary); margin-bottom: 6px;">No orders yet</h3>
+          <p style="font-size: 13px;">Orders will appear here as users start purchasing.</p>
         </div>
       </div>
     </div>
@@ -1108,6 +1489,8 @@ function navigate(pageName) {
   if (pageName === 'sections') renderSections();
   if (pageName === 'faq') renderFaq();
   if (pageName === 'products') renderProducts();
+  if (pageName === 'pending') renderPending();
+  if (pageName === 'orders') renderAdminOrders();
   if (pageName === 'users') renderUsers();
 }
 document.querySelectorAll('.sidebar-link[data-page]').forEach(l => {
@@ -1586,6 +1969,472 @@ async function deleteProduct(id, name) {
 
 /* ---------- USERS ---------- */
 let USERS_CACHE = [];
+
+/* ============================================================
+   PENDING REVIEW — admin approve/reject user submissions
+   ============================================================ */
+async function renderPending() {
+  const list = document.getElementById('pending-list');
+  const empty = document.getElementById('pending-empty');
+  const countEl = document.getElementById('pending-count');
+  if (!list) return;
+
+  list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted)">Loading...</div>';
+
+  await ensureAdminLists();
+
+  const { data: products, error } = await window.sb
+    .from('products')
+    .select('id, name, slug, description, long_description, base_price, images, status, owner_user_id, category_id, total_orders, completion_rate, like_rate, delivery_time, created_at')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:#ff3a6e">Error: ' + error.message + '</div>';
+    return;
+  }
+
+  const count = (products || []).length;
+  countEl.textContent = count;
+  // Update sidebar badge
+  const badge = document.getElementById('admin-pending-badge');
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? '' : 'none';
+  }
+
+  if (count === 0) {
+    list.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Get owner profiles in one query
+  const ownerIds = [...new Set(products.map(p => p.owner_user_id).filter(Boolean))];
+  let owners = {};
+  if (ownerIds.length > 0) {
+    const { data: profs } = await window.sb
+      .from('profiles')
+      .select('id, display_name, avatar_url')
+      .in('id', ownerIds);
+    (profs || []).forEach(pr => owners[pr.id] = pr);
+  }
+
+  list.innerHTML = products.map(p => {
+    const cat = CATEGORIES_CACHE.find(c => c.id === p.category_id);
+    const owner = p.owner_user_id ? owners[p.owner_user_id] : null;
+    const ownerName = owner ? (owner.display_name || 'Unknown') : 'Unknown';
+    const cover = (p.images && p.images[0]) || '';
+    const dateStr = p.created_at ? new Date(p.created_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+    const escName = (p.name || '').replace(/"/g, '&quot;').replace(/'/g, '\\\'');
+    return `
+      <div style="display:grid; grid-template-columns: 90px 1fr auto; gap: 16px; padding: 16px 18px; border-bottom: 1px solid var(--border-default); align-items: center;">
+        <div style="width:90px; height:90px; border-radius:10px; background: var(--bg-input); overflow: hidden; ${cover ? `background-image:url('${cover}'); background-size:cover; background-position:center;` : ''}">
+          ${!cover ? '<div style="width:100%;height:100%;display:grid;place-items:center;color:var(--text-muted);font-size:22px;font-weight:700">' + (p.name || '?').charAt(0).toUpperCase() + '</div>' : ''}
+        </div>
+        <div style="min-width:0;">
+          <div style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${escapeHtml(p.name || 'Untitled')}</div>
+          <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">${escapeHtml(p.description || '')}</div>
+          <div style="font-size: 12px; color: var(--text-muted); display:flex; flex-wrap:wrap; gap: 14px;">
+            <span><strong style="color:var(--text-secondary)">Price:</strong> $${Number(p.base_price || 0).toFixed(2)}</span>
+            <span><strong style="color:var(--text-secondary)">Category:</strong> ${cat ? escapeHtml(cat.label) : '—'}</span>
+            <span><strong style="color:var(--text-secondary)">Submitted by:</strong> ${escapeHtml(ownerName)}</span>
+            <span><strong style="color:var(--text-secondary)">Date:</strong> ${escapeHtml(dateStr)}</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; flex-shrink:0;">
+          <button class="btn" style="padding:8px 14px;" onclick="window.open('product.html?slug=${encodeURIComponent(p.slug || '')}', '_blank')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            View
+          </button>
+          <button class="btn" style="padding:8px 14px; color:#ff3a6e; border-color:rgba(255,58,110,0.4);" onclick="rejectPending('${p.id}', '${escName}')">
+            Reject
+          </button>
+          <button class="btn btn-primary" style="padding:8px 14px;" onclick="approvePending('${p.id}', '${escName}')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+            Approve
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+async function approvePending(id, name) {
+  if (!confirm(`Approve "${name}" and publish to marketplace?`)) return;
+  const { error } = await window.sb
+    .from('products')
+    .update({ status: 'approved', updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) {
+    toast('Approve failed: ' + error.message, true);
+  } else {
+    toast('Approved!');
+    renderPending();
+  }
+}
+
+async function rejectPending(id, name) {
+  const reason = prompt(`Reject "${name}"?\n\nEnter a reason for the user (optional):`);
+  if (reason === null) return; // cancelled
+  const { error } = await window.sb
+    .from('products')
+    .update({ status: 'rejected', reject_reason: reason || 'No reason provided', updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) {
+    toast('Reject failed: ' + error.message, true);
+  } else {
+    toast('Rejected.');
+    renderPending();
+  }
+}
+
+// Auto-refresh pending count badge on admin load
+async function refreshPendingBadge() {
+  if (!window.sb) return;
+  const { count } = await window.sb
+    .from('products')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'pending');
+  const badge = document.getElementById('admin-pending-badge');
+  if (badge) {
+    badge.textContent = count || 0;
+    badge.style.display = count > 0 ? '' : 'none';
+  }
+}
+setTimeout(refreshPendingBadge, 1500);
+
+/* ============================================================
+   ADMIN ORDERS — view all, resolve disputes
+   ============================================================ */
+let ADMIN_ORDERS_CACHE = [];
+let ADMIN_ORDERS_FILTER = 'all';
+let ADMIN_ORDERS_SEARCH = '';
+
+async function renderAdminOrders() {
+  const tbody = document.getElementById('orders-tbody');
+  const empty = document.getElementById('orders-empty');
+  const totalEl = document.getElementById('orders-count');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="9" style="padding:32px;text-align:center;color:var(--text-muted)">Loading...</td></tr>';
+
+  // Trigger auto-complete pass for any orders past 5-day warranty
+  try { await sb.rpc('auto_complete_expired_orders'); } catch (e) {}
+
+  // Fetch orders with product slug/name
+  const { data: orders, error } = await sb
+    .from('orders')
+    .select(`
+      id, order_number, buyer_id, seller_id, product_id,
+      tier_label, qty, amount_usd, coin, status, created_at,
+      products ( slug, name, logo_char )
+    `)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="9" style="padding:24px;text-align:center;color:#ff3a6e">Error: ${error.message}</td></tr>`;
+    return;
+  }
+  if (!orders || orders.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+    totalEl.textContent = '0';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Resolve display names from profiles
+  const userIds = [...new Set([
+    ...orders.map(o => o.buyer_id).filter(Boolean),
+    ...orders.map(o => o.seller_id).filter(Boolean)
+  ])];
+
+  const profileMap = {};
+  if (userIds.length > 0) {
+    const { data: profiles } = await sb
+      .from('profiles')
+      .select('id, display_name')
+      .in('id', userIds);
+    (profiles || []).forEach(p => { profileMap[p.id] = p.display_name || '—'; });
+  }
+
+  ADMIN_ORDERS_CACHE = orders.map(o => ({
+    ...o,
+    buyer_name: profileMap[o.buyer_id] || '—',
+    seller_name: o.seller_id ? (profileMap[o.seller_id] || '—') : '—'
+  }));
+
+  paintAdminOrders();
+  setupAdminOrdersFilters();
+}
+
+function paintAdminOrders() {
+  const tbody = document.getElementById('orders-tbody');
+  const totalEl = document.getElementById('orders-count');
+  const empty = document.getElementById('orders-empty');
+
+  // Update counts
+  const buckets = { all: ADMIN_ORDERS_CACHE.length, in_escrow:0, delivered:0, completed:0, refunded:0, cancelled:0, disputed:0 };
+  ADMIN_ORDERS_CACHE.forEach(o => { buckets[o.status] = (buckets[o.status] || 0) + 1; });
+  document.getElementById('ord-cnt-all').textContent       = buckets.all;
+  document.getElementById('ord-cnt-in_escrow').textContent = buckets.in_escrow;
+  document.getElementById('ord-cnt-delivered').textContent = buckets.delivered;
+  document.getElementById('ord-cnt-completed').textContent = buckets.completed;
+  document.getElementById('ord-cnt-refunded').textContent  = buckets.refunded;
+  document.getElementById('ord-cnt-cancelled').textContent = buckets.cancelled;
+  document.getElementById('ord-cnt-disputed').textContent  = buckets.disputed;
+  totalEl.textContent = buckets.all;
+
+  // Disputed badge in sidebar
+  const dbadge = document.getElementById('admin-disputed-badge');
+  if (dbadge) {
+    if (buckets.disputed > 0) {
+      dbadge.textContent = buckets.disputed;
+      dbadge.style.display = '';
+    } else {
+      dbadge.style.display = 'none';
+    }
+  }
+
+  // Filter rows
+  const filtered = ADMIN_ORDERS_CACHE.filter(o => {
+    if (ADMIN_ORDERS_FILTER !== 'all' && o.status !== ADMIN_ORDERS_FILTER) return false;
+    if (ADMIN_ORDERS_SEARCH) {
+      const q = ADMIN_ORDERS_SEARCH.toLowerCase();
+      const hay = (o.order_number + ' ' + o.buyer_name + ' ' + o.seller_name + ' ' + ((o.products && o.products.name) || '')).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="padding:32px;text-align:center;color:var(--text-muted)">No orders match the filter.</td></tr>';
+    return;
+  }
+
+  function escA(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function fmtDate(iso) {
+    const d = new Date(iso);
+    const pad = n => String(n).padStart(2, '0');
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  tbody.innerHTML = filtered.map(o => {
+    const productName = (o.products && o.products.name) || 'Unknown';
+    const productSlug = (o.products && o.products.slug) || '';
+
+    // Actions: disputed orders get full resolution kit; other unfinished orders get Cancel
+    let actions = '';
+    if (o.status === 'disputed') {
+      actions = `
+        <button class="ord-action-btn" onclick="adminViewDispute('${o.id}')" title="View dispute details">View</button>
+        <button class="ord-action-btn refund" onclick="adminResolveDispute('${o.id}', 'refund')" title="Refund buyer">Refund</button>
+        <button class="ord-action-btn release" onclick="adminResolveDispute('${o.id}', 'release')" title="Release to seller">Release</button>
+        <button class="ord-action-btn" onclick="adminResolveDispute('${o.id}', 'reject')" title="Reject dispute">Reject</button>
+      `;
+    } else if (['in_escrow', 'delivered'].includes(o.status)) {
+      actions = `<button class="ord-action-btn refund" onclick="adminCancelOrder('${o.id}')" title="Cancel order &amp; refund buyer">Cancel</button>`;
+    }
+
+    return `
+      <tr>
+        <td><a href="#" onclick="return false" style="color:var(--accent-blue); font-family:'Space Grotesk',sans-serif; font-weight:600; text-decoration:none">${escA(o.order_number)}</a></td>
+        <td style="color:var(--text-muted); font-size:12px;">${escA(fmtDate(o.created_at))}</td>
+        <td style="font-weight:500;">${escA(o.buyer_name)}</td>
+        <td style="font-weight:500;">${escA(o.seller_name)}</td>
+        <td>
+          <a href="product.html?slug=${encodeURIComponent(productSlug)}" target="_blank" style="color:var(--text-primary); text-decoration:none;">${escA(productName)}</a>
+          <div style="color:var(--text-muted); font-size:11.5px;">${escA(o.tier_label || 'Base')}</div>
+        </td>
+        <td style="text-align:right; font-weight:600;">${o.qty}</td>
+        <td style="text-align:right; font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--text-primary);">$${Number(o.amount_usd).toFixed(2)} <span style="color:var(--text-muted); font-size:11px; margin-left:4px;">${escA(o.coin)}</span></td>
+        <td><span class="ord-status ${escA(o.status)}">${escA(o.status.replace('_', ' '))}</span></td>
+        <td style="text-align:right; white-space:nowrap;">${actions || '<span style="color:var(--text-muted); font-size:11px;">—</span>'}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function setupAdminOrdersFilters() {
+  // Filter buttons
+  document.querySelectorAll('.ord-filter').forEach(btn => {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ord-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ADMIN_ORDERS_FILTER = btn.dataset.status;
+      paintAdminOrders();
+    });
+  });
+  // Search
+  const s = document.getElementById('orders-search');
+  if (s && !s.dataset.bound) {
+    s.dataset.bound = '1';
+    s.addEventListener('input', e => {
+      ADMIN_ORDERS_SEARCH = e.target.value;
+      paintAdminOrders();
+    });
+  }
+}
+
+async function adminResolveDispute(orderId, action) {
+  // Find the open dispute for this order
+  const { data: disputes, error } = await sb
+    .from('disputes')
+    .select('id')
+    .eq('order_id', orderId)
+    .eq('status', 'open')
+    .limit(1);
+  if (error || !disputes || disputes.length === 0) {
+    alert('No open dispute found for this order.');
+    return;
+  }
+  const disputeId = disputes[0].id;
+
+  const labels = {
+    refund:  'Refund the BUYER (buyer wins). Money goes back to buyer, order is refunded.',
+    release: 'Release escrow to the SELLER (seller wins). Order is completed.',
+    reject:  'Reject the dispute. Order returns to delivered, buyer can dispute again later in the warranty period.'
+  };
+  const note = prompt(labels[action] + '\\n\\nAdmin note (saved on the dispute):', '');
+  if (note === null) return;
+
+  try {
+    const { error: rpcErr } = await sb.rpc('admin_resolve_dispute', {
+      p_dispute_id: disputeId,
+      p_action: action,
+      p_admin_note: note
+    });
+    if (rpcErr) throw rpcErr;
+    alert('Dispute resolved.');
+    renderAdminOrders();
+  } catch (e) {
+    alert('Resolve failed: ' + (e.message || e));
+  }
+}
+
+async function adminCancelOrder(orderId) {
+  const reason = prompt('Cancel this order and refund the buyer in full?\\n\\nReason (saved on the order):', '');
+  if (reason === null) return;
+  try {
+    const { error } = await sb.rpc('admin_cancel_order', {
+      p_order_id: orderId,
+      p_reason: reason
+    });
+    if (error) throw error;
+    alert('Order cancelled and refunded.');
+    renderAdminOrders();
+  } catch (e) {
+    alert('Cancel failed: ' + (e.message || e));
+  }
+}
+
+async function adminViewDispute(orderId) {
+  // Get all disputes (open + resolved) for this order
+  const { data: disputes, error } = await sb
+    .from('disputes')
+    .select('*')
+    .eq('order_id', orderId)
+    .order('created_at', { ascending: false });
+  if (error) {
+    alert('Error: ' + error.message);
+    return;
+  }
+  if (!disputes || disputes.length === 0) {
+    alert('No disputes found for this order.');
+    return;
+  }
+
+  // Get buyer name
+  const buyerIds = [...new Set(disputes.map(d => d.buyer_id))];
+  const { data: profiles } = await sb.from('profiles').select('id, display_name').in('id', buyerIds);
+  const nameMap = {};
+  (profiles || []).forEach(p => { nameMap[p.id] = p.display_name; });
+
+  function escD(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+  const STATUS_LABEL = {
+    open: '<span style="background:rgba(245,158,11,0.18); color:#F59E0B; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">OPEN</span>',
+    resolved_refund: '<span style="background:rgba(255,58,110,0.15); color:#ff3a6e; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">REFUNDED</span>',
+    resolved_release: '<span style="background:rgba(16,185,129,0.15); color:#10B981; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">RELEASED</span>',
+    rejected: '<span style="background:rgba(156,163,175,0.15); color:#9CA3AF; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">REJECTED</span>'
+  };
+
+  const existing = document.getElementById('admin-dispute-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'admin-dispute-modal';
+  modal.style.cssText = 'position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:20px; overflow-y:auto;';
+
+  const disputesHtml = disputes.map(d => {
+    const evidenceHtml = (d.evidence_files || []).map(url => {
+      const isVideo = /\\.(mp4|webm|mov|avi|mkv)(\\?|$)/i.test(url);
+      if (isVideo) {
+        return `<video src="${escD(url)}" controls style="width:140px; height:100px; object-fit:cover; border-radius:6px; background:#000;"></video>`;
+      }
+      return `<a href="${escD(url)}" target="_blank" style="display:block;"><img src="${escD(url)}" style="width:140px; height:100px; object-fit:cover; border-radius:6px;"></a>`;
+    }).join('');
+
+    const created = new Date(d.created_at);
+    const resolved = d.resolved_at ? new Date(d.resolved_at) : null;
+    return `
+      <div style="background:#0a0f1c; border:1px solid #1F2937; border-radius:10px; padding:16px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:13px; color:#9CA3AF;">By <strong style="color:#fff;">${escD(nameMap[d.buyer_id] || '—')}</strong> · ${created.toLocaleString('en-US')}</div>
+          ${STATUS_LABEL[d.status] || d.status}
+        </div>
+        <div style="font-size:13px; color:#fff; line-height:1.55; margin-bottom:12px; white-space:pre-wrap;">${escD(d.reason)}</div>
+        ${evidenceHtml ? `<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">${evidenceHtml}</div>` : ''}
+        ${d.admin_note ? `<div style="background:rgba(58,171,255,0.08); border-left:3px solid #3AABFF; padding:8px 12px; border-radius:4px; margin-top:10px; font-size:12.5px; color:#cbd5e1;"><strong style="color:#3AABFF;">Admin note:</strong> ${escD(d.admin_note)}${resolved ? ` · <span style="color:#9CA3AF;">${resolved.toLocaleString('en-US')}</span>` : ''}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  modal.innerHTML = `
+    <div style="background:#131B2D; border:1px solid #1F2937; border-radius:14px; padding:28px; width:100%; max-width:680px; box-shadow:0 24px 64px rgba(0,0,0,0.6); max-height:90vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+        <div>
+          <h2 style="font-size:20px; font-weight:700; color:#fff; margin-bottom:4px;">Dispute history</h2>
+          <p style="font-size:12.5px; color:#9CA3AF;">${disputes.length} dispute${disputes.length>1?'s':''} on this order</p>
+        </div>
+        <button id="adm-dsp-close" type="button" style="background:transparent; border:none; color:#9CA3AF; font-size:22px; cursor:pointer; padding:4px 10px;">×</button>
+      </div>
+      ${disputesHtml}
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
+
+  function close() { modal.remove(); document.body.style.overflow = ''; }
+  modal.querySelector('#adm-dsp-close').addEventListener('click', close);
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+}
+
+// Refresh disputed badge on load
+async function refreshDisputedBadge() {
+  if (!sb) return;
+  try {
+    const { count } = await sb.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'disputed');
+    const badge = document.getElementById('admin-disputed-badge');
+    if (!badge) return;
+    if (count && count > 0) {
+      badge.textContent = count;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch (e) {}
+}
+setTimeout(refreshDisputedBadge, 1800);
 
 async function renderUsers() {
   const tbody = document.getElementById('users-tbody');

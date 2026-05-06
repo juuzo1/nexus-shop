@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Nexus Marketplace — Decentralized Digital Goods</title>
+<title>Settings — Nexus.Market</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -2460,6 +2460,474 @@
     from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  /* ============================================================
+     SETTINGS PAGE
+     ============================================================ */
+  .settings-page {
+    padding: 40px 0 60px;
+    min-height: 70vh;
+  }
+  .settings-header {
+    margin-bottom: 28px;
+  }
+  .settings-page-title {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .settings-page-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 28px;
+    align-items: flex-start;
+  }
+  @media (max-width: 800px) {
+    .settings-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Sidebar */
+  .settings-sidebar {
+    position: sticky;
+    top: 130px;
+  }
+  @media (max-width: 800px) {
+    .settings-sidebar { position: static; }
+  }
+  .settings-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    padding: 8px;
+  }
+  @media (max-width: 800px) {
+    .settings-nav {
+      flex-direction: row;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .settings-nav::-webkit-scrollbar { display: none; }
+  }
+  .snav {
+    display: flex; align-items: center; gap: 10px;
+    background: none; border: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .snav:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+  .snav.active {
+    background: rgba(58, 171, 255, 0.1);
+    color: var(--accent-blue);
+  }
+  .snav svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .snav-divider {
+    height: 1px;
+    background: var(--border-default);
+    margin: 6px 4px;
+  }
+  .snav-danger { color: #ff3a6e; }
+  .snav-danger:hover { background: rgba(255, 58, 110, 0.08); color: #ff3a6e; }
+  .snav-danger.active { background: rgba(255, 58, 110, 0.15); color: #ff3a6e; }
+
+  /* Content */
+  .settings-content { min-width: 0; }
+  .ssection { display: none; }
+  .ssection.active { display: block; }
+
+  .ssection-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .ssection-title-danger { color: #ff3a6e; }
+  .ssection-sub {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  /* Cards */
+  .set-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+  .set-card-danger { border-color: rgba(255, 58, 110, 0.3); }
+  .set-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .set-card-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  /* Rows / inputs */
+  .set-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .set-row:last-child { margin-bottom: 0; }
+  .set-row label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .set-row-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 600px) {
+    .set-row-2col { grid-template-columns: 1fr; }
+  }
+  .set-input, .set-textarea, .set-select {
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .set-input:focus, .set-textarea:focus, .set-select:focus { border-color: var(--accent-blue); }
+  .set-input:disabled, .set-textarea:disabled, .set-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .set-textarea { resize: vertical; min-height: 80px; }
+  .set-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .set-link {
+    color: var(--accent-blue);
+    text-decoration: none;
+  }
+  .set-link:hover { text-decoration: underline; }
+
+  /* Input with prefix */
+  .set-input-prefix {
+    display: flex;
+    align-items: center;
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    transition: border-color 0.15s;
+  }
+  .set-input-prefix:focus-within { border-color: var(--accent-blue); }
+  .set-input-prefix-text {
+    padding: 10px 0 10px 12px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .set-input-prefix .set-input {
+    border: none;
+    background: transparent;
+    padding-left: 4px;
+  }
+  .set-input-prefix .set-input:focus { border: none; }
+
+  /* Cover preview */
+  .set-cover-preview {
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1B2A4E 0%, #2C4D8A 50%, #3A7BD5 100%);
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 14px;
+    border: 1px solid var(--border-default);
+  }
+
+  /* Avatar */
+  .set-avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .set-avatar-preview {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    background-size: cover; background-position: center;
+    display: grid; place-items: center;
+    color: white;
+    font-size: 34px; font-weight: 700;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  /* Buttons */
+  .set-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .set-btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 9px;
+    padding: 10px 22px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.15s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .set-btn-primary:hover { filter: brightness(1.12); }
+  .set-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .set-btn-secondary {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    border-radius: 9px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .set-btn-secondary svg { width: 14px; height: 14px; }
+  .set-btn-secondary:hover:not(:disabled) {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+  }
+  .set-btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .set-btn-text {
+    background: none; border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 8px 4px;
+    font-family: inherit;
+  }
+  .set-btn-text:hover { color: var(--text-primary); }
+  .set-btn-danger { color: #ff3a6e; }
+  .set-btn-danger:hover { color: #ff3a6e; }
+  .set-btn-danger-solid {
+    background: #ff3a6e;
+    color: white;
+    border: none;
+    border-radius: 9px;
+    padding: 10px 22px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.15s;
+    font-family: inherit;
+  }
+  .set-btn-danger-solid:hover { filter: brightness(1.1); }
+
+  /* Action bar */
+  .set-actions-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+    padding-top: 8px;
+  }
+  .set-status {
+    font-size: 13px;
+    color: var(--success-green);
+  }
+  .set-status.error { color: #ff3a6e; }
+
+  /* Toggle switch */
+  .set-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-default);
+  }
+  .set-toggle-row:first-child { padding-top: 0; }
+  .set-toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .set-toggle-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .set-toggle-sub {
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+  .set-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px; height: 22px;
+    flex-shrink: 0;
+  }
+  .set-switch input { display: none; }
+  .set-switch span {
+    position: absolute;
+    inset: 0;
+    background: var(--border-default);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+  .set-switch span::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: white;
+    transition: transform 0.18s;
+  }
+  .set-switch input:checked + span { background: var(--accent-blue); }
+  .set-switch input:checked + span::after { transform: translateX(18px); }
+
+  /* Sessions */
+  .set-session-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    margin-bottom: 8px;
+  }
+  .set-session-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--bg-elevated);
+    display: grid; place-items: center;
+    color: var(--text-muted);
+  }
+  .set-session-icon svg { width: 18px; height: 18px; }
+  .set-session-info { flex: 1; }
+  .set-session-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .set-session-current {
+    background: rgba(16,185,129,0.15);
+    color: #10B981;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .set-session-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* Theme picker */
+  .set-theme-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 600px) { .set-theme-grid { grid-template-columns: 1fr 1fr; } }
+  .set-theme-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: var(--bg-input);
+    border: 2px solid var(--border-default);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 13px; font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+  }
+  .set-theme-card input { display: none; }
+  .set-theme-card.active {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+  }
+  .set-theme-card-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .set-theme-card em {
+    font-style: normal;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 11px;
+  }
+  .set-theme-preview {
+    width: 100%; height: 64px;
+    border-radius: 6px;
+    border: 1px solid var(--border-default);
+  }
+  .set-theme-dark { background: linear-gradient(135deg, #070B14 0%, #131B2D 100%); }
+  .set-theme-light { background: linear-gradient(135deg, #F5F7FA 0%, #E5EAF0 100%); }
+  .set-theme-auto { background: linear-gradient(90deg, #070B14 0%, #070B14 50%, #F5F7FA 50%, #E5EAF0 100%); }
+
+  /* Color swatches */
+  .set-color-grid {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .set-color-swatch {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .set-color-swatch.active {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 2px var(--bg-base);
+  }
+  .set-color-swatch:disabled { opacity: 0.4; cursor: not-allowed; }
+
 </style>
 </head>
 <body>
@@ -2626,25 +3094,408 @@
   </div>
 </nav>
 
-<!-- ============= HERO ============= -->
-<section class="hero">
+<!-- ============= SETTINGS PAGE ============= -->
+<section class="settings-page">
   <div class="container">
-    <h1 id="hero-title" class="fade-in" style="animation-delay: 0.05s;"></h1>
-    <p id="hero-desc" class="fade-in" style="animation-delay: 0.1s;"></p>
-    <div id="hero-ctas" class="hero-ctas fade-in" style="animation-delay: 0.15s;"></div>
-    <div id="hero-stats" class="stats fade-in" style="animation-delay: 0.3s;"></div>
+    <div class="settings-header">
+      <h1 class="settings-page-title">Settings</h1>
+      <p class="settings-page-sub">Manage your account, security, and preferences.</p>
+    </div>
+
+    <div class="settings-grid">
+      <!-- SIDEBAR -->
+      <aside class="settings-sidebar">
+        <nav class="settings-nav" id="settings-nav">
+          <button class="snav active" data-section="profile">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+          </button>
+          <button class="snav" data-section="account">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+            Account
+          </button>
+          <button class="snav" data-section="security">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Security
+          </button>
+          <button class="snav" data-section="notifications">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            Notifications
+          </button>
+          <button class="snav" data-section="privacy">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Privacy
+          </button>
+          <button class="snav" data-section="appearance">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.5 6.32 17.18 2 12 2z"/></svg>
+            Appearance
+          </button>
+          <div class="snav-divider"></div>
+          <button class="snav snav-danger" data-section="danger">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            Danger zone
+          </button>
+        </nav>
+      </aside>
+
+      <!-- CONTENT -->
+      <div class="settings-content">
+
+        <!-- ============ PROFILE ============ -->
+        <div class="ssection active" id="ssec-profile">
+          <h2 class="ssection-title">Profile</h2>
+          <p class="ssection-sub">Update how others see you on Nexus.Market.</p>
+
+          <!-- Cover -->
+          <div class="set-card">
+            <div class="set-card-title">Cover image</div>
+            <div class="set-card-sub">Recommended size 1500×500. Max 5MB.</div>
+            <div class="set-cover-preview" id="set-cover-preview"></div>
+            <div class="set-card-actions">
+              <input type="file" id="set-cover-input" accept="image/*" hidden>
+              <button class="set-btn-secondary" onclick="document.getElementById('set-cover-input').click()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                Upload cover
+              </button>
+              <button class="set-btn-text" id="set-cover-remove">Remove</button>
+            </div>
+          </div>
+
+          <!-- Avatar -->
+          <div class="set-card">
+            <div class="set-card-title">Avatar</div>
+            <div class="set-card-sub">Recommended square image, at least 200×200.</div>
+            <div class="set-avatar-row">
+              <div class="set-avatar-preview" id="set-avatar-preview"><span id="set-avatar-fallback">U</span></div>
+              <div class="set-card-actions">
+                <input type="file" id="set-avatar-input" accept="image/*" hidden>
+                <button class="set-btn-secondary" onclick="document.getElementById('set-avatar-input').click()">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                  Upload avatar
+                </button>
+                <button class="set-btn-text" id="set-avatar-remove">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Names + bio -->
+          <div class="set-card">
+            <div class="set-card-title">Identity</div>
+            <div class="set-row-2col">
+              <div class="set-row">
+                <label for="set-display-name">Display name</label>
+                <input class="set-input" id="set-display-name" type="text" placeholder="Your name" maxlength="60">
+                <div class="set-hint">Shown next to your products and reviews.</div>
+              </div>
+              <div class="set-row">
+                <label for="set-username">Username</label>
+                <input class="set-input" id="set-username" type="text" placeholder="username" maxlength="30">
+                <div class="set-hint">Your URL: nexus.market/profile?id=<span id="set-username-preview">username</span></div>
+              </div>
+            </div>
+            <div class="set-row">
+              <label for="set-bio">Bio</label>
+              <textarea class="set-textarea" id="set-bio" maxlength="280" placeholder="Tell people about yourself…"></textarea>
+              <div class="set-hint"><span id="set-bio-count">0</span>/280</div>
+            </div>
+          </div>
+
+          <!-- Social links -->
+          <div class="set-card">
+            <div class="set-card-title">Social links</div>
+            <div class="set-card-sub">Optional. Shown on your public profile.</div>
+            <div class="set-row-2col">
+              <div class="set-row">
+                <label for="set-x">X (Twitter)</label>
+                <div class="set-input-prefix">
+                  <span class="set-input-prefix-text">@</span>
+                  <input class="set-input" id="set-x" type="text" placeholder="username">
+                </div>
+              </div>
+              <div class="set-row">
+                <label for="set-ig">Instagram</label>
+                <div class="set-input-prefix">
+                  <span class="set-input-prefix-text">@</span>
+                  <input class="set-input" id="set-ig" type="text" placeholder="username">
+                </div>
+              </div>
+              <div class="set-row">
+                <label for="set-reddit">Reddit</label>
+                <div class="set-input-prefix">
+                  <span class="set-input-prefix-text">u/</span>
+                  <input class="set-input" id="set-reddit" type="text" placeholder="username">
+                </div>
+              </div>
+              <div class="set-row">
+                <label for="set-discord">Discord</label>
+                <input class="set-input" id="set-discord" type="text" placeholder="user#0000">
+              </div>
+            </div>
+          </div>
+
+          <div class="set-actions-bar">
+            <span class="set-status" id="profile-status"></span>
+            <button class="set-btn-primary" data-save="profile">Save changes</button>
+          </div>
+        </div>
+
+        <!-- ============ ACCOUNT ============ -->
+        <div class="ssection" id="ssec-account">
+          <h2 class="ssection-title">Account</h2>
+          <p class="ssection-sub">Email, language, and currency preferences.</p>
+
+          <div class="set-card">
+            <div class="set-card-title">Email address</div>
+            <div class="set-row">
+              <input class="set-input" id="set-email" type="email" value="hihi@gmail.com" disabled>
+              <div class="set-hint">Used for login and order delivery. <a href="#" class="set-link">Change email</a></div>
+            </div>
+          </div>
+
+          <div class="set-card">
+            <div class="set-card-title">Language &amp; Currency</div>
+            <div class="set-row-2col">
+              <div class="set-row">
+                <label for="set-lang">Language</label>
+                <select class="set-select" id="set-lang">
+                  <option value="en">English</option>
+                  <option value="vi">Tiếng Việt</option>
+                  <option value="es">Español</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                </select>
+              </div>
+              <div class="set-row">
+                <label for="set-cur">Currency</label>
+                <select class="set-select" id="set-cur">
+                  <option value="USD">USD — US Dollar</option>
+                  <option value="EUR">EUR — Euro</option>
+                  <option value="GBP">GBP — British Pound</option>
+                  <option value="JPY">JPY — Japanese Yen</option>
+                  <option value="VND">VND — Vietnamese Dong</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="set-actions-bar">
+            <span class="set-status" id="account-status"></span>
+            <button class="set-btn-primary" data-save="account">Save changes</button>
+          </div>
+        </div>
+
+        <!-- ============ SECURITY ============ -->
+        <div class="ssection" id="ssec-security">
+          <h2 class="ssection-title">Security</h2>
+          <p class="ssection-sub">Keep your account safe.</p>
+
+          <div class="set-card">
+            <div class="set-card-title">Change password</div>
+            <div class="set-row">
+              <label for="set-current-pw">Current password</label>
+              <input class="set-input" id="set-current-pw" type="password" placeholder="••••••••">
+            </div>
+            <div class="set-row-2col">
+              <div class="set-row">
+                <label for="set-new-pw">New password</label>
+                <input class="set-input" id="set-new-pw" type="password" placeholder="At least 8 characters">
+              </div>
+              <div class="set-row">
+                <label for="set-confirm-pw">Confirm new password</label>
+                <input class="set-input" id="set-confirm-pw" type="password" placeholder="Re-type new password">
+              </div>
+            </div>
+            <div class="set-actions-bar">
+              <span class="set-status" id="password-status"></span>
+              <button class="set-btn-primary" data-save="password">Update password</button>
+            </div>
+          </div>
+
+          <div class="set-card">
+            <div class="set-card-title">Two-factor authentication</div>
+            <div class="set-card-sub">Add a second layer of protection to your account.</div>
+            <div class="set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Authenticator app (TOTP)</div>
+                <div class="set-toggle-sub">Use Google Authenticator, Authy, or similar.</div>
+              </div>
+              <button class="set-btn-secondary" disabled>Coming soon</button>
+            </div>
+          </div>
+
+          <div class="set-card">
+            <div class="set-card-title">Active sessions</div>
+            <div class="set-card-sub">Devices currently signed in to your account.</div>
+            <div class="set-session-row">
+              <div class="set-session-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" ry="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+              </div>
+              <div class="set-session-info">
+                <div class="set-session-name">Chrome on Windows <span class="set-session-current">This device</span></div>
+                <div class="set-session-meta">Last active just now</div>
+              </div>
+            </div>
+            <button class="set-btn-text set-btn-danger">Sign out of all other devices</button>
+          </div>
+        </div>
+
+        <!-- ============ NOTIFICATIONS ============ -->
+        <div class="ssection" id="ssec-notifications">
+          <h2 class="ssection-title">Notifications</h2>
+          <p class="ssection-sub">Choose what we email you about.</p>
+
+          <div class="set-card">
+            <div class="set-card-title">Email notifications</div>
+
+            <div class="set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Order updates</div>
+                <div class="set-toggle-sub">Delivery confirmations, refunds, disputes.</div>
+              </div>
+              <label class="set-switch"><input type="checkbox" checked><span></span></label>
+            </div>
+            <div class="set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Price drops on wishlist</div>
+                <div class="set-toggle-sub">Get notified when items in your wishlist go on sale.</div>
+              </div>
+              <label class="set-switch"><input type="checkbox" checked><span></span></label>
+            </div>
+            <div class="set-toggle-row">
+              <div>
+                <div class="set-toggle-label">New followers</div>
+                <div class="set-toggle-sub">Someone followed your seller profile.</div>
+              </div>
+              <label class="set-switch"><input type="checkbox"><span></span></label>
+            </div>
+            <div class="set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Marketplace digest</div>
+                <div class="set-toggle-sub">Weekly highlights, trending listings.</div>
+              </div>
+              <label class="set-switch"><input type="checkbox"><span></span></label>
+            </div>
+          </div>
+
+          <div class="set-card">
+            <div class="set-card-title">Browser push</div>
+            <div class="set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Enable push notifications</div>
+                <div class="set-toggle-sub">Get instant alerts in your browser.</div>
+              </div>
+              <label class="set-switch"><input type="checkbox"><span></span></label>
+            </div>
+          </div>
+
+          <div class="set-actions-bar">
+            <span class="set-status" id="notif-status"></span>
+            <button class="set-btn-primary" data-save="notifications">Save preferences</button>
+          </div>
+        </div>
+
+        <!-- ============ PRIVACY ============ -->
+        <div class="ssection" id="ssec-privacy">
+          <h2 class="ssection-title">Privacy</h2>
+          <p class="ssection-sub">Control what others can see about you.</p>
+
+          <div class="set-card">
+            <div class="set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Public profile</div>
+                <div class="set-toggle-sub">Anyone with your profile URL can view your listings, reviews, and stats.</div>
+              </div>
+              <label class="set-switch"><input type="checkbox" checked><span></span></label>
+            </div>
+            <div class="set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Show in search results</div>
+                <div class="set-toggle-sub">Allow your profile to appear in marketplace search.</div>
+              </div>
+              <label class="set-switch"><input type="checkbox" checked><span></span></label>
+            </div>
+            <div class="set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Hide order history</div>
+                <div class="set-toggle-sub">Keep your purchases private even from sellers you bought from.</div>
+              </div>
+              <label class="set-switch"><input type="checkbox"><span></span></label>
+            </div>
+            <div class="set-toggle-row">
+              <div>
+                <div class="set-toggle-label">Allow direct messages</div>
+                <div class="set-toggle-sub">Let other users send you messages.</div>
+              </div>
+              <label class="set-switch"><input type="checkbox" checked><span></span></label>
+            </div>
+          </div>
+
+          <div class="set-actions-bar">
+            <span class="set-status" id="privacy-status"></span>
+            <button class="set-btn-primary" data-save="privacy">Save changes</button>
+          </div>
+        </div>
+
+        <!-- ============ APPEARANCE ============ -->
+        <div class="ssection" id="ssec-appearance">
+          <h2 class="ssection-title">Appearance</h2>
+          <p class="ssection-sub">Customize how Nexus.Market looks for you.</p>
+
+          <div class="set-card">
+            <div class="set-card-title">Theme</div>
+            <div class="set-theme-grid">
+              <label class="set-theme-card active">
+                <input type="radio" name="theme" value="dark" checked>
+                <div class="set-theme-preview set-theme-dark"></div>
+                <span>Dark</span>
+              </label>
+              <label class="set-theme-card set-theme-card-disabled">
+                <input type="radio" name="theme" value="light" disabled>
+                <div class="set-theme-preview set-theme-light"></div>
+                <span>Light <em>(soon)</em></span>
+              </label>
+              <label class="set-theme-card set-theme-card-disabled">
+                <input type="radio" name="theme" value="auto" disabled>
+                <div class="set-theme-preview set-theme-auto"></div>
+                <span>System <em>(soon)</em></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="set-card">
+            <div class="set-card-title">Accent color</div>
+            <div class="set-card-sub">Coming soon.</div>
+            <div class="set-color-grid">
+              <button class="set-color-swatch active" style="background:#3AABFF" title="Blue (default)"></button>
+              <button class="set-color-swatch" style="background:#10B981" title="Green" disabled></button>
+              <button class="set-color-swatch" style="background:#A259FF" title="Purple" disabled></button>
+              <button class="set-color-swatch" style="background:#FA2D48" title="Red" disabled></button>
+              <button class="set-color-swatch" style="background:#F59E0B" title="Amber" disabled></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ DANGER ============ -->
+        <div class="ssection" id="ssec-danger">
+          <h2 class="ssection-title ssection-title-danger">Danger zone</h2>
+          <p class="ssection-sub">These actions are permanent and cannot be undone.</p>
+
+          <div class="set-card set-card-danger">
+            <div class="set-card-title">Deactivate account</div>
+            <div class="set-card-sub">Temporarily hide your profile and listings. You can reactivate by logging in again.</div>
+            <button class="set-btn-secondary set-btn-danger">Deactivate</button>
+          </div>
+
+          <div class="set-card set-card-danger">
+            <div class="set-card-title">Delete account</div>
+            <div class="set-card-sub">Permanently delete your account, listings, reviews, and data. This cannot be undone.</div>
+            <button class="set-btn-danger-solid" id="btn-delete-account">Delete my account</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
-
-<section class="section" data-section-id="best-sellers"></section>
-
-<section class="section" data-section-id="trending"></section>
-
-<section class="section" data-section-id="new-arrivals"></section>
-
-<section class="section" data-section-id="premium-picks"></section>
-
-<section class="section section-faq" id="faq-section"></section>
 
 <!-- ============= FOOTER ============= -->
 <footer>
@@ -2758,7 +3609,9 @@ function renderSubNav() {
 
 function renderHero() {
   const h = SITE_DATA.hero;
-  document.getElementById('hero-title').innerHTML = h.title_html;
+  const titleEl = document.getElementById('hero-title');
+  if (!titleEl) return;
+  titleEl.innerHTML = h.title_html;
   document.getElementById('hero-desc').textContent = h.description;
 
   document.getElementById('hero-ctas').innerHTML = h.ctas.map(c => {
@@ -2817,10 +3670,6 @@ function renderProductCard(p) {
 }
 
 function renderProductSection(s) {
-  // Hide section entirely when there are no products
-  if (!s.products || s.products.length === 0) {
-    return ''; // section element will simply be empty
-  }
   // Show only first 2 rows. Grid is 5 cols on desktop, so 10 items.
   // (On smaller breakpoints grid is 4/3/2 cols — 10 items still fills cleanly.)
   const cards = s.products.slice(0, 10).map(renderProductCard).join('\n');
@@ -2884,14 +3733,15 @@ SITE_DATA_READY.then(() => {
   document.getElementById('site-logo').innerHTML = renderLogo();
   document.getElementById('site-logo-footer').innerHTML = renderLogo();
   document.getElementById('sub-nav').innerHTML = renderSubNav();
-  renderHero();
 
+  // Hero / sections / faq don't exist on profile page — guard to no-op
+  if (document.getElementById('hero-title')) renderHero();
   SITE_DATA.sections.forEach(s => {
     const target = document.querySelector(`section[data-section-id="${s.id}"]`);
     if (target) target.innerHTML = renderProductSection(s);
   });
-
-  document.getElementById('faq-section').innerHTML = renderFAQ();
+  const faqEl = document.getElementById('faq-section');
+  if (faqEl) faqEl.innerHTML = renderFAQ();
 });
 
 /* ============================================================
@@ -3830,7 +4680,6 @@ SITE_DATA_READY.then(() => {
 
   let selectedCode = 'USDT';
 
-  // Load balances from Supabase
   async function loadBalances() {
     if (!window.sb) return;
     try {
@@ -3859,7 +4708,6 @@ SITE_DATA_READY.then(() => {
       console.warn('[wallet] load failed', e);
     }
   }
-  // Expose for refresh after order placement
   window.refreshWalletBalances = loadBalances;
 
   function shortBalance(amt) {
@@ -3890,7 +4738,6 @@ SITE_DATA_READY.then(() => {
         </div>
       `).join('');
 
-    // Demo top-up panel below list
     const demoPanel = `
       <div style="border-top:1px solid var(--border-default); padding:10px 12px; display:flex; gap:6px; align-items:center;">
         <input id="wallet-demo-amount" type="number" min="1" step="any" placeholder="Demo amount" value="100"
@@ -3903,7 +4750,6 @@ SITE_DATA_READY.then(() => {
     `;
     listEl.innerHTML = itemsHtml + demoPanel;
 
-    // Wire demo topup button
     const btn = document.getElementById('wallet-demo-topup');
     if (btn) {
       btn.addEventListener('click', async () => {
@@ -3931,10 +4777,8 @@ SITE_DATA_READY.then(() => {
 
   paintNav();
   paintList('');
-  // Load real balances when sb client is ready
   if (window.sb) loadBalances();
   else {
-    // Wait briefly for sb to load
     const t = setInterval(() => {
       if (window.sb) {
         clearInterval(t);
@@ -3943,7 +4787,6 @@ SITE_DATA_READY.then(() => {
     }, 200);
     setTimeout(() => clearInterval(t), 5000);
   }
-  // Reload balances whenever auth state changes
   if (window.sb && window.sb.auth) {
     try {
       window.sb.auth.onAuthStateChange((_event) => {
@@ -4088,6 +4931,292 @@ SITE_DATA_READY.then(() => {
   update();
 })();
 </script>
+
+<script>
+/* ============================================================
+   SETTINGS PAGE LOGIC
+   Mock storage in localStorage 'nx_settings' for now.
+   Will wire to Supabase profiles table later.
+   ============================================================ */
+(function() {
+  const KEY = 'nx_settings';
+
+  // Default settings (mock)
+  const DEFAULTS = {
+    profile: {
+      display_name: 'hihi',
+      username: 'hihi',
+      bio: 'Just browsing for now.',
+      avatar_url: null,
+      cover_url: null,
+      socials: { x: '', instagram: '', reddit: '', discord: '' }
+    },
+    account: { language: 'en', currency: 'USD' },
+    notifications: { order: true, price_drops: true, new_followers: false, digest: false, push: false },
+    privacy: { public_profile: true, search_visible: true, hide_orders: false, allow_dm: true }
+  };
+
+  function readState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY)) || {};
+      // deep merge defaults
+      return {
+        profile: { ...DEFAULTS.profile, ...(saved.profile || {}), socials: { ...DEFAULTS.profile.socials, ...((saved.profile && saved.profile.socials) || {}) } },
+        account: { ...DEFAULTS.account, ...(saved.account || {}) },
+        notifications: { ...DEFAULTS.notifications, ...(saved.notifications || {}) },
+        privacy: { ...DEFAULTS.privacy, ...(saved.privacy || {}) }
+      };
+    } catch (e) {
+      return JSON.parse(JSON.stringify(DEFAULTS));
+    }
+  }
+  function writeState(state) {
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+
+  let state = readState();
+
+  // ---- Sidebar nav ----
+  function setupNav() {
+    document.querySelectorAll('.snav').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.snav').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.ssection').forEach(s => s.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('ssec-' + btn.dataset.section).classList.add('active');
+        history.replaceState(null, '', '#' + btn.dataset.section);
+      });
+    });
+
+    // Activate from hash
+    const hash = (window.location.hash || '').replace('#', '');
+    if (hash) {
+      const tab = document.querySelector(`.snav[data-section="${hash}"]`);
+      if (tab) tab.click();
+    }
+  }
+
+  // ---- Populate Profile section ----
+  function paintProfile() {
+    const p = state.profile;
+    document.getElementById('set-display-name').value = p.display_name || '';
+    document.getElementById('set-username').value = p.username || '';
+    document.getElementById('set-username-preview').textContent = p.username || 'username';
+    document.getElementById('set-bio').value = p.bio || '';
+    document.getElementById('set-bio-count').textContent = (p.bio || '').length;
+    document.getElementById('set-x').value = p.socials.x || '';
+    document.getElementById('set-ig').value = p.socials.instagram || '';
+    document.getElementById('set-reddit').value = p.socials.reddit || '';
+    document.getElementById('set-discord').value = p.socials.discord || '';
+
+    // Cover
+    const coverEl = document.getElementById('set-cover-preview');
+    if (p.cover_url) {
+      coverEl.style.backgroundImage = `url('${p.cover_url}')`;
+    } else {
+      coverEl.style.backgroundImage = '';
+    }
+    // Avatar
+    const avEl = document.getElementById('set-avatar-preview');
+    const avFb = document.getElementById('set-avatar-fallback');
+    if (p.avatar_url) {
+      avEl.style.backgroundImage = `url('${p.avatar_url}')`;
+      avFb.style.display = 'none';
+    } else {
+      avEl.style.backgroundImage = '';
+      avFb.style.display = '';
+      avFb.textContent = (p.display_name || '?').charAt(0).toUpperCase();
+    }
+  }
+
+  // ---- Wire profile inputs ----
+  function setupProfileInputs() {
+    document.getElementById('set-username').addEventListener('input', e => {
+      document.getElementById('set-username-preview').textContent = e.target.value || 'username';
+    });
+    document.getElementById('set-bio').addEventListener('input', e => {
+      document.getElementById('set-bio-count').textContent = e.target.value.length;
+    });
+    document.getElementById('set-display-name').addEventListener('input', e => {
+      const fb = document.getElementById('set-avatar-fallback');
+      if (fb) fb.textContent = (e.target.value || '?').charAt(0).toUpperCase();
+    });
+
+    // Cover/avatar upload (mock - convert to data URL for preview)
+    document.getElementById('set-cover-input').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        document.getElementById('set-cover-preview').style.backgroundImage = `url('${ev.target.result}')`;
+        state.profile.cover_url = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById('set-avatar-input').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        document.getElementById('set-avatar-preview').style.backgroundImage = `url('${ev.target.result}')`;
+        document.getElementById('set-avatar-fallback').style.display = 'none';
+        state.profile.avatar_url = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById('set-cover-remove').addEventListener('click', () => {
+      state.profile.cover_url = null;
+      document.getElementById('set-cover-preview').style.backgroundImage = '';
+    });
+    document.getElementById('set-avatar-remove').addEventListener('click', () => {
+      state.profile.avatar_url = null;
+      const av = document.getElementById('set-avatar-preview');
+      av.style.backgroundImage = '';
+      const fb = document.getElementById('set-avatar-fallback');
+      fb.style.display = '';
+    });
+  }
+
+  // ---- Save handlers ----
+  function showStatus(elId, msg, isError) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.toggle('error', !!isError);
+    setTimeout(() => { el.textContent = ''; el.classList.remove('error'); }, 3000);
+  }
+
+  function saveProfile() {
+    state.profile.display_name = document.getElementById('set-display-name').value.trim();
+    state.profile.username = document.getElementById('set-username').value.trim();
+    state.profile.bio = document.getElementById('set-bio').value.trim();
+    state.profile.socials = {
+      x: document.getElementById('set-x').value.trim(),
+      instagram: document.getElementById('set-ig').value.trim(),
+      reddit: document.getElementById('set-reddit').value.trim(),
+      discord: document.getElementById('set-discord').value.trim()
+    };
+    if (!state.profile.display_name) {
+      showStatus('profile-status', 'Display name is required.', true);
+      return;
+    }
+    if (!/^[a-z0-9_]{3,30}$/i.test(state.profile.username)) {
+      showStatus('profile-status', 'Username: 3-30 chars, letters/numbers/underscore only.', true);
+      return;
+    }
+    writeState(state);
+    showStatus('profile-status', 'Saved!');
+  }
+
+  function saveAccount() {
+    state.account.language = document.getElementById('set-lang').value;
+    state.account.currency = document.getElementById('set-cur').value;
+    writeState(state);
+    showStatus('account-status', 'Saved!');
+  }
+
+  function savePassword() {
+    const cur = document.getElementById('set-current-pw').value;
+    const np  = document.getElementById('set-new-pw').value;
+    const cp  = document.getElementById('set-confirm-pw').value;
+    if (!cur || !np || !cp) {
+      showStatus('password-status', 'Fill in all password fields.', true);
+      return;
+    }
+    if (np.length < 8) {
+      showStatus('password-status', 'New password must be at least 8 characters.', true);
+      return;
+    }
+    if (np !== cp) {
+      showStatus('password-status', 'New passwords do not match.', true);
+      return;
+    }
+    // TODO: wire to supabase.auth.updateUser({ password: np })
+    document.getElementById('set-current-pw').value = '';
+    document.getElementById('set-new-pw').value = '';
+    document.getElementById('set-confirm-pw').value = '';
+    showStatus('password-status', 'Password updated! (mock)');
+  }
+
+  function saveNotifications() {
+    const rows = document.querySelectorAll('#ssec-notifications .set-toggle-row .set-switch input');
+    const keys = ['order', 'price_drops', 'new_followers', 'digest', 'push'];
+    rows.forEach((cb, i) => {
+      if (keys[i]) state.notifications[keys[i]] = cb.checked;
+    });
+    writeState(state);
+    showStatus('notif-status', 'Saved!');
+  }
+
+  function savePrivacy() {
+    const rows = document.querySelectorAll('#ssec-privacy .set-toggle-row .set-switch input');
+    const keys = ['public_profile', 'search_visible', 'hide_orders', 'allow_dm'];
+    rows.forEach((cb, i) => {
+      if (keys[i]) state.privacy[keys[i]] = cb.checked;
+    });
+    writeState(state);
+    showStatus('privacy-status', 'Saved!');
+  }
+
+  // ---- Boot ----
+  function paintAccount() {
+    document.getElementById('set-lang').value = state.account.language;
+    document.getElementById('set-cur').value = state.account.currency;
+  }
+  function paintNotifications() {
+    const rows = document.querySelectorAll('#ssec-notifications .set-toggle-row .set-switch input');
+    const keys = ['order', 'price_drops', 'new_followers', 'digest', 'push'];
+    rows.forEach((cb, i) => {
+      if (keys[i]) cb.checked = !!state.notifications[keys[i]];
+    });
+  }
+  function paintPrivacy() {
+    const rows = document.querySelectorAll('#ssec-privacy .set-toggle-row .set-switch input');
+    const keys = ['public_profile', 'search_visible', 'hide_orders', 'allow_dm'];
+    rows.forEach((cb, i) => {
+      if (keys[i]) cb.checked = !!state.privacy[keys[i]];
+    });
+  }
+
+  function boot() {
+    paintProfile();
+    paintAccount();
+    paintNotifications();
+    paintPrivacy();
+    setupNav();
+    setupProfileInputs();
+
+    // Save buttons (event delegation)
+    document.addEventListener('click', e => {
+      const saveBtn = e.target.closest('[data-save]');
+      if (!saveBtn) return;
+      const action = saveBtn.dataset.save;
+      if (action === 'profile') saveProfile();
+      else if (action === 'account') saveAccount();
+      else if (action === 'password') savePassword();
+      else if (action === 'notifications') saveNotifications();
+      else if (action === 'privacy') savePrivacy();
+    });
+
+    // Delete account confirm
+    const delBtn = document.getElementById('btn-delete-account');
+    if (delBtn) delBtn.addEventListener('click', () => {
+      const ok = confirm('Permanently delete your account? This cannot be undone.\n\nType DELETE in the next prompt to confirm.');
+      if (!ok) return;
+      const word = prompt('Type DELETE to confirm:');
+      if (word === 'DELETE') {
+        alert('Account deletion (mock — would call supabase.auth.admin.deleteUser).');
+      } else {
+        alert('Cancelled.');
+      }
+    });
+  }
+
+  if (window.SITE_DATA_READY) window.SITE_DATA_READY.then(boot);
+  else document.addEventListener('DOMContentLoaded', boot);
+})();
+</script>
+
 <script>
 /* ============================================================
    POPUP COORDINATOR — only ONE popup open at a time.

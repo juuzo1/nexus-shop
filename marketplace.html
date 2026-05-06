@@ -2013,6 +2013,37 @@
   .stat-icon.like       { background: rgba(236, 72, 153, 0.14); color: #EC4899; }
   .stat-icon.delivery   { background: rgba(245, 158, 11, 0.14); color: #F59E0B; }
 
+  /* NEW badge for brand-new products (no orders yet) */
+  .card-new-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 9px;
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+  }
+  .stat-row-new-full {
+    grid-column: 1 / -1;
+    justify-content: center;
+    padding: 2px 0;
+  }
+  .stat-new-pill {
+    background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1));
+    color: #10B981;
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 4px 11px;
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
   .card-seller {
     display: flex;
     align-items: center;
@@ -2298,7 +2329,7 @@
 
       <div class="nav-search-wrap">
         <div class="nav-search">
-        <input type="text" placeholder="What are you looking for ?" />
+        <input type="search" placeholder="What are you looking for ?" autocomplete="off" name="nx-search" />
         <div class="nav-search-divider"></div>
         <button class="nav-search-cat" id="cat-trigger" aria-haspopup="true" aria-expanded="false">
           All categories
@@ -2403,19 +2434,23 @@
               </div>
               <div class="auth-divider"></div>
               <div class="auth-menu">
-                <a class="auth-menu-item" href="#">
+                <a class="auth-menu-item" href="profile.html">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                   Profile
                 </a>
-                <a class="auth-menu-item" href="#">
+                <a class="auth-menu-item" href="dashboard.html">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                  Dashboard
+                </a>
+                <a class="auth-menu-item" href="orders.html">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg>
                   Order History
                 </a>
-                <a class="auth-menu-item" href="#">
+                <a class="auth-menu-item" href="wishlist.html">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
                   Wishlist
                 </a>
-                <a class="auth-menu-item" href="#">
+                <a class="auth-menu-item" href="settings.html">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                   Settings
                 </a>
@@ -2944,6 +2979,10 @@ function renderProductCard(p) {
     ? `<div class="card-cover-img" style="background-image: url('${esc(p.cover_url)}');"></div>`
     : `<div class="card-logo ${esc(p.logo_class)}">${esc(p.logo)}</div>`;
   const headerClass = p.cover_url ? 'has-cover' : esc(p.theme);
+  // When product has no orders yet, show 0% for completion/like instead of misleading 100/99
+  const orders = Number((p.orders || '0').toString().replace(/[^\d.-]/g, '')) || 0;
+  const compStr = orders === 0 ? '0' : esc(p.completion);
+  const likeStr = orders === 0 ? '0.00' : esc(p.like);
   return `
     <a class="card" href="product.html?slug=${slug}">
       <div class="card-header ${headerClass}">
@@ -2957,8 +2996,8 @@ function renderProductCard(p) {
         <div class="card-desc">${esc(p.desc)}</div>
         <div class="card-stats">
           <div class="stat-row" data-tooltip="Total completed orders by this seller"><span class="stat-icon orders">${I_PKG}</span><strong>${esc(p.orders)}</strong></div>
-          <div class="stat-row" data-tooltip="Successful transaction rate"><span class="stat-icon completion">${I_CHECK}</span><strong>${esc(p.completion)}%</strong></div>
-          <div class="stat-row" data-tooltip="Buyer satisfaction rate"><span class="stat-icon like">${I_THUMB}</span><strong>${esc(p.like)}%</strong></div>
+          <div class="stat-row" data-tooltip="Successful transaction rate"><span class="stat-icon completion">${I_CHECK}</span><strong>${compStr}%</strong></div>
+          <div class="stat-row" data-tooltip="Buyer satisfaction rate"><span class="stat-icon like">${I_THUMB}</span><strong>${likeStr}%</strong></div>
           <div class="stat-row" data-tooltip="Average delivery time"><span class="stat-icon delivery">${I_CLOCK}</span><strong>${esc(p.delivery)}</strong></div>
         </div>
         <div class="card-seller">
@@ -3951,20 +3990,19 @@ SITE_DATA_READY.then(() => {
 <script>
 /* Wallet coin dropdown — click balance area to open. Search + select coin. */
 (function() {
-  const COINS = [
-    { code:'USDT', name:'USD Tether',   color:'#26A17B', letter:'T', amount:'0.05560468' },
-    { code:'BTC',  name:'Bitcoin',      color:'#F7931A', letter:'B', amount:'0.00000000' },
-    { code:'ETH',  name:'Ethereum',     color:'#627EEA', letter:'E', amount:'0.00000000' },
-    { code:'LTC',  name:'Litecoin',     color:'#345D9D', letter:'Ł', amount:'0.00000000' },
-    { code:'SOL',  name:'Solana',       color:'#9945FF', letter:'S', amount:'0.00000028' },
-    { code:'DOGE', name:'Dogecoin',     color:'#C2A633', letter:'Ð', amount:'0.00000000' },
-    { code:'BCH',  name:'Bitcoin Cash', color:'#0AC18E', letter:'B', amount:'0.00000000' },
-    { code:'XRP',  name:'XRP',          color:'#23292F', letter:'X', amount:'0.00000000' },
-    { code:'TRX',  name:'TRON',         color:'#E50915', letter:'T', amount:'0.00000000' },
-    { code:'ADA',  name:'Cardano',      color:'#0033AD', letter:'A', amount:'0.00000000' },
-    { code:'MATIC',name:'Polygon',      color:'#8247E5', letter:'M', amount:'0.00000000' },
-    { code:'BNB',  name:'BNB',          color:'#F3BA2F', letter:'B', amount:'0.00000000' }
-  ];
+  // Coin metadata. Stablecoins only (1 USDT = 1 USDC = 1 USD).
+  const COIN_META = {
+    USDT: { name: 'USD Tether', color: '#26A17B', letter: 'T' },
+    USDC: { name: 'USD Coin',   color: '#2775CA', letter: 'C' }
+  };
+  const SUPPORTED_COINS = ['USDT', 'USDC'];
+  let COINS = SUPPORTED_COINS.map(code => ({
+    code,
+    name: COIN_META[code].name,
+    color: COIN_META[code].color,
+    letter: COIN_META[code].letter,
+    amount: '0.00000000'
+  }));
 
   const wrap     = document.getElementById('wallet-btn');
   const trigger  = document.getElementById('wallet-trigger');
@@ -3976,11 +4014,39 @@ SITE_DATA_READY.then(() => {
   const navCoin    = document.getElementById('wallet-nav-coin');
   if (!wrap || !trigger || !dropdown || !listEl) return;
 
-  // Selected coin (default USDT). Show shorter version on the navbar.
   let selectedCode = 'USDT';
 
+  async function loadBalances() {
+    if (!window.sb) return;
+    try {
+      const { data: { user } } = await window.sb.auth.getUser();
+      if (!user) return;
+      const { data, error } = await window.sb
+        .from('wallets')
+        .select('coin, balance')
+        .eq('user_id', user.id);
+      if (error) {
+        console.warn('[wallet] balance fetch failed', error);
+        return;
+      }
+      const map = {};
+      (data || []).forEach(r => { map[r.coin] = r.balance; });
+      COINS = SUPPORTED_COINS.map(code => ({
+        code,
+        name: COIN_META[code].name,
+        color: COIN_META[code].color,
+        letter: COIN_META[code].letter,
+        amount: Number(map[code] || 0).toFixed(8)
+      }));
+      paintNav();
+      paintList(searchEl ? searchEl.value : '');
+    } catch (e) {
+      console.warn('[wallet] load failed', e);
+    }
+  }
+  window.refreshWalletBalances = loadBalances;
+
   function shortBalance(amt) {
-    // Trim trailing zeros down to 4 decimals max
     const n = parseFloat(amt);
     if (n === 0) return '0.0000';
     return n.toFixed(4);
@@ -3998,21 +4064,72 @@ SITE_DATA_READY.then(() => {
     const filtered = q
       ? COINS.filter(c => c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q))
       : COINS;
-    if (filtered.length === 0) {
-      listEl.innerHTML = '<div class="wallet-coin-empty">No currencies found</div>';
-      return;
-    }
-    listEl.innerHTML = filtered.map(c => `
-      <div class="wallet-coin-item${c.code === selectedCode ? ' active' : ''}" data-code="${c.code}">
-        <span class="wallet-coin-item-balance">${c.amount}</span>
-        <span class="coin-icon" style="background:${c.color};">${c.letter}</span>
-        <span class="wallet-coin-item-name">${c.code}</span>
+    const itemsHtml = filtered.length === 0
+      ? '<div class="wallet-coin-empty">No currencies found</div>'
+      : filtered.map(c => `
+        <div class="wallet-coin-item${c.code === selectedCode ? ' active' : ''}" data-code="${c.code}">
+          <span class="wallet-coin-item-balance">${c.amount}</span>
+          <span class="coin-icon" style="background:${c.color};">${c.letter}</span>
+          <span class="wallet-coin-item-name">${c.code}</span>
+        </div>
+      `).join('');
+
+    const demoPanel = `
+      <div style="border-top:1px solid var(--border-default); padding:10px 12px; display:flex; gap:6px; align-items:center;">
+        <input id="wallet-demo-amount" type="number" min="1" step="any" placeholder="Demo amount" value="100"
+          style="flex:1; background:var(--bg-input); border:1px solid var(--border-default); border-radius:7px; padding:7px 10px; color:var(--text-primary); font-size:12.5px; outline:none; font-family:inherit;">
+        <button id="wallet-demo-topup" type="button"
+          style="background:var(--gradient-primary); color:white; border:none; border-radius:7px; padding:7px 12px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; white-space:nowrap;">
+          + Demo top-up
+        </button>
       </div>
-    `).join('');
+    `;
+    listEl.innerHTML = itemsHtml + demoPanel;
+
+    const btn = document.getElementById('wallet-demo-topup');
+    if (btn) {
+      btn.addEventListener('click', async () => {
+        const amount = parseFloat(document.getElementById('wallet-demo-amount').value);
+        if (!amount || amount <= 0) { alert('Enter a valid amount'); return; }
+        if (!window.sb) { alert('Database not connected'); return; }
+        const { data: { user } } = await window.sb.auth.getUser();
+        if (!user) { alert('Please log in first'); return; }
+        btn.disabled = true; btn.textContent = '...';
+        try {
+          const { error } = await window.sb.rpc('demo_topup', {
+            p_coin: selectedCode,
+            p_amount: amount
+          });
+          if (error) throw error;
+          await loadBalances();
+        } catch (e) {
+          alert('Top-up failed: ' + (e.message || e));
+        } finally {
+          btn.disabled = false; btn.textContent = '+ Demo top-up';
+        }
+      });
+    }
   }
 
   paintNav();
   paintList('');
+  if (window.sb) loadBalances();
+  else {
+    const t = setInterval(() => {
+      if (window.sb) {
+        clearInterval(t);
+        loadBalances();
+      }
+    }, 200);
+    setTimeout(() => clearInterval(t), 5000);
+  }
+  if (window.sb && window.sb.auth) {
+    try {
+      window.sb.auth.onAuthStateChange((_event) => {
+        loadBalances();
+      });
+    } catch (e) {}
+  }
 
   // Move dropdown to <body> to escape navbar's stacking context.
   if (dropdown.parentElement !== document.body) {

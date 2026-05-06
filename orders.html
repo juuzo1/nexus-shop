@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Nexus Marketplace — Decentralized Digital Goods</title>
+<title>Order History — Nexus.Market</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -2460,6 +2460,337 @@
     from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  /* ============================================================
+     ORDERS PAGE
+     ============================================================ */
+  .orders-page { padding: 40px 0 60px; min-height: 70vh; }
+  .orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .orders-title {
+    font-size: 30px; font-weight: 700; letter-spacing: -0.02em;
+    color: var(--text-primary); margin-bottom: 6px;
+  }
+  .orders-sub { font-size: 14px; color: var(--text-muted); }
+
+  .orders-search {
+    display: flex; align-items: center;
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: 10px;
+    padding: 0 12px;
+    width: 320px;
+    max-width: 100%;
+    transition: border-color 0.15s;
+  }
+  .orders-search:focus-within { border-color: var(--accent-blue); }
+  .orders-search svg { width: 16px; height: 16px; color: var(--text-muted); flex-shrink: 0; }
+  .orders-search input {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text-primary);
+    font-size: 14px; font-family: inherit;
+    padding: 10px 12px;
+  }
+  .orders-search input::placeholder { color: var(--text-muted); }
+
+  /* Filters */
+  .orders-filters {
+    display: flex; gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .ofilter {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.15s;
+  }
+  .ofilter:hover {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+  }
+  .ofilter.active {
+    background: rgba(58, 171, 255, 0.12);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+  }
+  .ofilter-count {
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    min-width: 18px;
+    text-align: center;
+  }
+  .ofilter.active .ofilter-count {
+    background: var(--accent-blue);
+    color: white;
+  }
+
+  /* Order card */
+  .order-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 14px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .order-card:hover { border-color: var(--border-hover); }
+
+  .order-card-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 18px;
+    background: rgba(0,0,0,0.15);
+    border-bottom: 1px solid var(--border-default);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .order-id {
+    font-family: 'Space Grotesk', monospace, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+  }
+  .order-date {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .order-status-badge {
+    font-size: 11.5px; font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .order-status-badge svg { width: 12px; height: 12px; }
+  .order-status-badge.completed { background: rgba(16,185,129,0.15); color: #10B981; }
+  .order-status-badge.pending   { background: rgba(251,191,36,0.15); color: #FBBF24; }
+  .order-status-badge.refunded  { background: rgba(255,58,110,0.15); color: #ff3a6e; }
+  .order-status-badge.disputed  { background: rgba(168,85,247,0.15); color: #A855F7; }
+
+  /* Items list */
+  .order-items {
+    padding: 6px 18px;
+  }
+  .order-item-row {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .order-item-row:last-child { border-bottom: none; }
+  .order-item-img {
+    width: 56px; height: 56px;
+    border-radius: 10px;
+    background: var(--bg-input);
+    background-size: cover; background-position: center;
+    display: grid; place-items: center;
+    color: white; font-size: 22px; font-weight: 700;
+    overflow: hidden;
+  }
+  .order-item-name {
+    font-size: 14.5px; font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+    display: block;
+  }
+  .order-item-name:hover { color: var(--accent-blue); }
+  .order-item-meta {
+    font-size: 12.5px; color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .order-item-price {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  /* Footer */
+  .order-card-foot {
+    padding: 14px 18px;
+    background: rgba(0,0,0,0.1);
+    border-top: 1px solid var(--border-default);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: center;
+  }
+  @media (max-width: 700px) {
+    .order-card-foot { grid-template-columns: 1fr; }
+  }
+  .order-payment {
+    display: flex; flex-direction: column; gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .order-payment-row {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .order-payment-label {
+    color: var(--text-muted);
+    margin-right: 4px;
+  }
+  .order-payment-coin {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-weight: 600;
+  }
+  .order-payment-coin-icon {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    color: white; font-size: 9px; font-weight: 700;
+  }
+  .order-tx {
+    font-family: 'Space Grotesk', monospace, sans-serif;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .order-tx-link {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+  .order-tx-link:hover { text-decoration: underline; }
+
+  .order-totals {
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 10px;
+  }
+  .order-total-row {
+    font-size: 13px; color: var(--text-muted);
+  }
+  .order-total-row strong {
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-left: 8px;
+  }
+  .order-actions {
+    display: flex; gap: 8px;
+  }
+  .order-btn {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12.5px; font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .order-btn svg { width: 13px; height: 13px; }
+  .order-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+  }
+  .order-btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+  }
+  .order-btn-primary:hover {
+    color: white;
+    filter: brightness(1.12);
+  }
+  .order-btn-confirm {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #10B981;
+  }
+  .order-btn-confirm:hover {
+    background: #10B981;
+    border-color: #10B981;
+    color: white;
+  }
+  .order-btn-dispute {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: #F59E0B;
+  }
+  .order-btn-dispute:hover {
+    background: #F59E0B;
+    border-color: #F59E0B;
+    color: white;
+  }
+  .order-btn-pending-dispute {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    border-radius: 7px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #F59E0B;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: inherit;
+  }
+  .order-btn-pending-dispute svg { width: 13px; height: 13px; }
+  .order-status-badge.delivered {
+    background: rgba(58, 171, 255, 0.14);
+    color: #3AABFF;
+  }
+
+  /* Empty state */
+  .orders-empty {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 14px;
+    padding: 56px 24px;
+    text-align: center;
+  }
+  .orders-empty-icon {
+    width: 72px; height: 72px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: var(--bg-input);
+    display: grid; place-items: center;
+    color: var(--text-muted);
+  }
+  .orders-empty-icon svg { width: 32px; height: 32px; }
+  .orders-empty h3 {
+    font-size: 20px; font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  .orders-empty p {
+    font-size: 14px; color: var(--text-muted);
+    margin-bottom: 22px;
+  }
+  .orders-empty-btn {
+    display: inline-flex; align-items: center;
+    background: var(--gradient-primary);
+    color: white; font-weight: 600; font-size: 14px;
+    padding: 11px 22px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: filter 0.15s;
+  }
+  .orders-empty-btn:hover { filter: brightness(1.12); }
+
 </style>
 </head>
 <body>
@@ -2626,25 +2957,43 @@
   </div>
 </nav>
 
-<!-- ============= HERO ============= -->
-<section class="hero">
+<!-- ============= ORDERS PAGE ============= -->
+<section class="orders-page">
   <div class="container">
-    <h1 id="hero-title" class="fade-in" style="animation-delay: 0.05s;"></h1>
-    <p id="hero-desc" class="fade-in" style="animation-delay: 0.1s;"></p>
-    <div id="hero-ctas" class="hero-ctas fade-in" style="animation-delay: 0.15s;"></div>
-    <div id="hero-stats" class="stats fade-in" style="animation-delay: 0.3s;"></div>
+    <div class="orders-header">
+      <div>
+        <h1 class="orders-title">Order History</h1>
+        <p class="orders-sub">All your purchases on Nexus.Market.</p>
+      </div>
+      <div class="orders-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="orders-search-input" placeholder="Search by order ID or product…" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- Filter chips -->
+    <div class="orders-filters" id="orders-filters">
+      <button class="ofilter active" data-filter="all">All <span class="ofilter-count" id="cnt-all">0</span></button>
+      <button class="ofilter" data-filter="completed">Completed <span class="ofilter-count" id="cnt-completed">0</span></button>
+      <button class="ofilter" data-filter="pending">Pending <span class="ofilter-count" id="cnt-pending">0</span></button>
+      <button class="ofilter" data-filter="refunded">Refunded <span class="ofilter-count" id="cnt-refunded">0</span></button>
+      <button class="ofilter" data-filter="disputed">Disputed <span class="ofilter-count" id="cnt-disputed">0</span></button>
+    </div>
+
+    <!-- Orders list -->
+    <div id="orders-list"></div>
+
+    <!-- Empty state -->
+    <div id="orders-empty" class="orders-empty" style="display:none">
+      <div class="orders-empty-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg>
+      </div>
+      <h3>No orders yet</h3>
+      <p>Your purchase history will appear here once you place your first order.</p>
+      <a href="marketplace.html" class="orders-empty-btn">Browse marketplace</a>
+    </div>
   </div>
 </section>
-
-<section class="section" data-section-id="best-sellers"></section>
-
-<section class="section" data-section-id="trending"></section>
-
-<section class="section" data-section-id="new-arrivals"></section>
-
-<section class="section" data-section-id="premium-picks"></section>
-
-<section class="section section-faq" id="faq-section"></section>
 
 <!-- ============= FOOTER ============= -->
 <footer>
@@ -2758,7 +3107,9 @@ function renderSubNav() {
 
 function renderHero() {
   const h = SITE_DATA.hero;
-  document.getElementById('hero-title').innerHTML = h.title_html;
+  const titleEl = document.getElementById('hero-title');
+  if (!titleEl) return;
+  titleEl.innerHTML = h.title_html;
   document.getElementById('hero-desc').textContent = h.description;
 
   document.getElementById('hero-ctas').innerHTML = h.ctas.map(c => {
@@ -2817,10 +3168,6 @@ function renderProductCard(p) {
 }
 
 function renderProductSection(s) {
-  // Hide section entirely when there are no products
-  if (!s.products || s.products.length === 0) {
-    return ''; // section element will simply be empty
-  }
   // Show only first 2 rows. Grid is 5 cols on desktop, so 10 items.
   // (On smaller breakpoints grid is 4/3/2 cols — 10 items still fills cleanly.)
   const cards = s.products.slice(0, 10).map(renderProductCard).join('\n');
@@ -2884,14 +3231,15 @@ SITE_DATA_READY.then(() => {
   document.getElementById('site-logo').innerHTML = renderLogo();
   document.getElementById('site-logo-footer').innerHTML = renderLogo();
   document.getElementById('sub-nav').innerHTML = renderSubNav();
-  renderHero();
 
+  // Hero / sections / faq don't exist on profile page — guard to no-op
+  if (document.getElementById('hero-title')) renderHero();
   SITE_DATA.sections.forEach(s => {
     const target = document.querySelector(`section[data-section-id="${s.id}"]`);
     if (target) target.innerHTML = renderProductSection(s);
   });
-
-  document.getElementById('faq-section').innerHTML = renderFAQ();
+  const faqEl = document.getElementById('faq-section');
+  if (faqEl) faqEl.innerHTML = renderFAQ();
 });
 
 /* ============================================================
@@ -3830,7 +4178,6 @@ SITE_DATA_READY.then(() => {
 
   let selectedCode = 'USDT';
 
-  // Load balances from Supabase
   async function loadBalances() {
     if (!window.sb) return;
     try {
@@ -3859,7 +4206,6 @@ SITE_DATA_READY.then(() => {
       console.warn('[wallet] load failed', e);
     }
   }
-  // Expose for refresh after order placement
   window.refreshWalletBalances = loadBalances;
 
   function shortBalance(amt) {
@@ -3890,7 +4236,6 @@ SITE_DATA_READY.then(() => {
         </div>
       `).join('');
 
-    // Demo top-up panel below list
     const demoPanel = `
       <div style="border-top:1px solid var(--border-default); padding:10px 12px; display:flex; gap:6px; align-items:center;">
         <input id="wallet-demo-amount" type="number" min="1" step="any" placeholder="Demo amount" value="100"
@@ -3903,7 +4248,6 @@ SITE_DATA_READY.then(() => {
     `;
     listEl.innerHTML = itemsHtml + demoPanel;
 
-    // Wire demo topup button
     const btn = document.getElementById('wallet-demo-topup');
     if (btn) {
       btn.addEventListener('click', async () => {
@@ -3931,10 +4275,8 @@ SITE_DATA_READY.then(() => {
 
   paintNav();
   paintList('');
-  // Load real balances when sb client is ready
   if (window.sb) loadBalances();
   else {
-    // Wait briefly for sb to load
     const t = setInterval(() => {
       if (window.sb) {
         clearInterval(t);
@@ -3943,7 +4285,6 @@ SITE_DATA_READY.then(() => {
     }, 200);
     setTimeout(() => clearInterval(t), 5000);
   }
-  // Reload balances whenever auth state changes
   if (window.sb && window.sb.auth) {
     try {
       window.sb.auth.onAuthStateChange((_event) => {
@@ -4088,6 +4429,482 @@ SITE_DATA_READY.then(() => {
   update();
 })();
 </script>
+
+<script>
+/* ============================================================
+   ORDERS PAGE LOGIC
+   Mock data for now; will wire to Supabase orders table later.
+   ============================================================ */
+(function() {
+  // Real orders from DB
+  const COIN_COLORS = { USDT: '#26A17B', USDC: '#2775CA' };
+
+  function escHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function fmtDate(iso) {
+    const d = new Date(iso);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} · ${time}`;
+  }
+
+  // Map DB status → UI status filter buckets
+  const STATUS_MAP = {
+    in_escrow: 'pending',
+    delivered: 'pending',   // delivered (waiting buyer confirm) treated as pending
+    completed: 'completed',
+    refunded:  'refunded',
+    disputed:  'disputed'
+  };
+
+  const STATUS_LABEL = {
+    in_escrow: 'pending',
+    delivered: 'delivered',
+    completed: 'completed',
+    refunded:  'refunded',
+    disputed:  'disputed'
+  };
+
+  const STATUS_ICONS = {
+    completed: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    pending:   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    delivered: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    refunded:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>',
+    disputed:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>'
+  };
+
+  let ORDERS = [];   // raw DB rows joined with product
+  let activeFilter = 'all';
+  let searchTerm = '';
+
+  async function fetchOrders() {
+    if (!window.sb) return [];
+    const { data: { user } } = await window.sb.auth.getUser();
+    if (!user) return [];
+
+    // Fetch orders with product info
+    const { data, error } = await window.sb
+      .from('orders')
+      .select(`
+        id, order_number, buyer_id, seller_id, product_id, tier_label,
+        qty, amount_usd, coin, status, delivered_at, completed_at, created_at,
+        products ( slug, name, theme, logo_class, logo_char, images )
+      `)
+      .eq('buyer_id', user.id)
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.warn('[orders] fetch failed', error);
+      return [];
+    }
+    return data || [];
+  }
+
+  function renderOrder(o) {
+    const p = o.products || {};
+    const cover = (p.images && p.images[0]) || null;
+    const logo  = p.logo_char || (p.name || '?').charAt(0).toUpperCase();
+    const slug  = p.slug || '';
+    const coinColor = COIN_COLORS[o.coin] || '#3AABFF';
+    const status = o.status; // raw DB status
+    const filterStatus = STATUS_MAP[status] || 'pending';
+    const label = STATUS_LABEL[status] || status;
+
+    // Cover/logo for the item
+    const itemImg = cover
+      ? `<div class="order-item-img" style="background-image:url('${escHtml(cover)}');background-size:cover;background-position:center"></div>`
+      : `<div class="order-item-img" style="background:linear-gradient(135deg,#3AABFF,#3A7BD5);">${escHtml(logo)}</div>`;
+
+    // Buttons depend on status
+    let actionsHtml = `
+      <button class="order-btn order-btn-primary" data-action="details" data-id="${escHtml(o.id)}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        View details
+      </button>
+    `;
+    // Confirm + Dispute only for delivered (in 5-day warranty)
+    if (status === 'delivered') {
+      const deliveredAt = o.delivered_at ? new Date(o.delivered_at).getTime() : 0;
+      const warrantyEnd = deliveredAt + 5 * 24 * 60 * 60 * 1000;
+      const stillInWarranty = deliveredAt > 0 && Date.now() < warrantyEnd;
+      if (stillInWarranty) {
+        actionsHtml += `
+          <button class="order-btn order-btn-confirm" data-action="confirm" data-id="${escHtml(o.id)}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Confirm
+          </button>
+          <button class="order-btn order-btn-dispute" data-action="dispute" data-id="${escHtml(o.id)}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+            Dispute
+          </button>
+        `;
+      }
+    } else if (status === 'disputed') {
+      // Order has open dispute — show "Dispute pending" badge instead of action buttons
+      actionsHtml += `
+        <span class="order-btn-pending-dispute">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Dispute under review
+        </span>
+      `;
+    }
+
+    return `
+      <div class="order-card" data-status="${escHtml(filterStatus)}" data-search="${escHtml((o.order_number + ' ' + (p.name||'')).toLowerCase())}">
+        <div class="order-card-head">
+          <div>
+            <div class="order-id">Order #${escHtml(o.order_number)}</div>
+            <div class="order-date">Placed ${escHtml(fmtDate(o.created_at))}</div>
+          </div>
+          <span class="order-status-badge ${escHtml(filterStatus)}">${STATUS_ICONS[label] || STATUS_ICONS[filterStatus] || ''} ${escHtml(label)}</span>
+        </div>
+
+        <div class="order-items">
+          <div class="order-item-row">
+            ${itemImg}
+            <div>
+              <a class="order-item-name" href="product.html?slug=${encodeURIComponent(slug)}">${escHtml(p.name || 'Unknown product')}</a>
+              <div class="order-item-meta">${escHtml(o.tier_label || 'Base')} · Qty ${o.qty}</div>
+            </div>
+            <span class="order-item-price">$${Number(o.amount_usd).toFixed(2)}</span>
+          </div>
+        </div>
+
+        <div class="order-card-foot">
+          <div class="order-payment">
+            <div class="order-payment-row">
+              <span class="order-payment-label">Payment:</span>
+              <span class="order-payment-coin">
+                <span class="order-payment-coin-icon" style="background:${coinColor}">${escHtml(o.coin.charAt(0))}</span>
+                ${escHtml(o.coin)}
+              </span>
+            </div>
+          </div>
+
+          <div class="order-totals">
+            <div class="order-total-row">
+              1 item (${o.qty} qty) <strong>$${Number(o.amount_usd).toFixed(2)}</strong>
+            </div>
+            <div class="order-actions">
+              ${actionsHtml}
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function applyFilters() {
+    const list = document.getElementById('orders-list');
+    const empty = document.getElementById('orders-empty');
+    const filtered = ORDERS.filter(o => {
+      const filterStatus = STATUS_MAP[o.status] || 'pending';
+      if (activeFilter !== 'all' && filterStatus !== activeFilter) return false;
+      if (searchTerm) {
+        const haystack = (o.order_number + ' ' + ((o.products && o.products.name) || '')).toLowerCase();
+        if (!haystack.includes(searchTerm.toLowerCase())) return false;
+      }
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = '';
+      empty.style.display = '';
+    } else {
+      empty.style.display = 'none';
+      list.innerHTML = filtered.map(renderOrder).join('');
+    }
+  }
+
+  function updateCounts() {
+    const buckets = { all: ORDERS.length, completed: 0, pending: 0, refunded: 0, disputed: 0 };
+    ORDERS.forEach(o => {
+      const f = STATUS_MAP[o.status] || 'pending';
+      buckets[f] = (buckets[f] || 0) + 1;
+    });
+    document.getElementById('cnt-all').textContent       = buckets.all;
+    document.getElementById('cnt-completed').textContent = buckets.completed;
+    document.getElementById('cnt-pending').textContent   = buckets.pending;
+    document.getElementById('cnt-refunded').textContent  = buckets.refunded;
+    document.getElementById('cnt-disputed').textContent  = buckets.disputed;
+  }
+
+  function setupFilters() {
+    document.querySelectorAll('.ofilter').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ofilter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    const searchInput = document.getElementById('orders-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', e => {
+        searchTerm = e.target.value;
+        applyFilters();
+      });
+    }
+
+    document.addEventListener('click', async e => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+
+      if (action === 'details') {
+        alert('Order details page — coming soon.');
+        return;
+      }
+
+      if (action === 'confirm') {
+        if (!confirm('Confirm you have received and verified this product? This will release funds to the seller.')) return;
+        btn.disabled = true; btn.textContent = '...';
+        try {
+          const { error } = await window.sb.rpc('confirm_order', { p_order_id: id });
+          if (error) throw error;
+          await reload();
+          if (typeof window.refreshWalletBalances === 'function') window.refreshWalletBalances();
+        } catch (e) {
+          alert('Confirm failed: ' + (e.message || e));
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      if (action === 'dispute') {
+        const order = ORDERS.find(o => o.id === id);
+        if (!order) return;
+        openDisputeModal(order);
+        return;
+      }
+    });
+  }
+
+  async function reload() {
+    // Lazy: trigger auto-complete for any orders past 5-day warranty
+    if (window.sb) {
+      try { await window.sb.rpc('auto_complete_expired_orders'); } catch (e) {}
+    }
+    ORDERS = await fetchOrders();
+    updateCounts();
+    applyFilters();
+  }
+
+  // ===== Dispute Modal =====
+  const MAX_IMAGES = 5;
+  const MAX_VIDEO_SIZE_MB = 100;
+
+  function openDisputeModal(order) {
+    const existing = document.getElementById('dispute-modal');
+    if (existing) existing.remove();
+
+    let imageFiles = [];   // File[]
+    let videoFile  = null; // File | null
+
+    const modal = document.createElement('div');
+    modal.id = 'dispute-modal';
+    modal.style.cssText = 'position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:20px; overflow-y:auto;';
+
+    modal.innerHTML = `
+      <div style="background:#131B2D; border:1px solid #1F2937; border-radius:14px; padding:28px; width:100%; max-width:560px; box-shadow:0 24px 64px rgba(0,0,0,0.6); max-height:90vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px;">
+          <div>
+            <h2 style="font-size:20px; font-weight:700; color:#fff; margin-bottom:4px;">Open dispute</h2>
+            <p style="font-size:12.5px; color:#9CA3AF;">Order #${escHtml(order.order_number)} · ${escHtml((order.products && order.products.name) || '')}</p>
+          </div>
+          <button id="dsp-close" type="button" style="background:transparent; border:none; color:#9CA3AF; font-size:22px; cursor:pointer; padding:4px 10px;">×</button>
+        </div>
+
+        <label style="display:block; font-size:12px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; margin-bottom:6px;">Describe the issue <span style="color:#ff3a6e;">*</span></label>
+        <textarea id="dsp-reason" rows="5" placeholder="Explain what went wrong with this order in detail..." style="width:100%; box-sizing:border-box; background:#0a0f1c; border:1px solid #1F2937; border-radius:9px; padding:12px 14px; color:#fff; font-size:13.5px; outline:none; font-family:inherit; resize:vertical; min-height:100px;"></textarea>
+        <div style="font-size:11.5px; color:#6B7280; margin-top:4px;">Min 10 characters · Required</div>
+
+        <div style="margin-top:18px;">
+          <label style="display:block; font-size:12px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; margin-bottom:6px;">Images (optional, up to ${MAX_IMAGES})</label>
+          <input id="dsp-images" type="file" accept="image/*" multiple style="display:none;">
+          <button id="dsp-pick-images" type="button" style="background:#0a0f1c; border:1px dashed #1F2937; border-radius:9px; padding:10px 14px; color:#9CA3AF; font-size:13px; cursor:pointer; font-family:inherit; width:100%;">+ Add images</button>
+          <div id="dsp-image-previews" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <label style="display:block; font-size:12px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; margin-bottom:6px;">Video (optional, max ${MAX_VIDEO_SIZE_MB}MB)</label>
+          <input id="dsp-video" type="file" accept="video/*" style="display:none;">
+          <button id="dsp-pick-video" type="button" style="background:#0a0f1c; border:1px dashed #1F2937; border-radius:9px; padding:10px 14px; color:#9CA3AF; font-size:13px; cursor:pointer; font-family:inherit; width:100%;">+ Add video</button>
+          <div id="dsp-video-preview" style="margin-top:8px;"></div>
+        </div>
+
+        <div id="dsp-error" style="display:none; background:rgba(255,58,110,0.1); border:1px solid rgba(255,58,110,0.3); border-radius:8px; padding:10px 12px; color:#ff3a6e; font-size:12.5px; margin-top:14px;"></div>
+
+        <div style="display:flex; gap:8px; margin-top:20px;">
+          <button id="dsp-cancel" type="button" style="flex:1; background:#1A2436; border:1px solid #1F2937; color:#fff; padding:11px; border-radius:9px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;">Cancel</button>
+          <button id="dsp-submit" type="button" style="flex:2; background:linear-gradient(135deg,#F59E0B,#D97706); border:none; color:#fff; padding:11px; border-radius:9px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">Submit dispute</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    function close() {
+      modal.remove();
+      document.body.style.overflow = '';
+    }
+    modal.querySelector('#dsp-close').addEventListener('click', close);
+    modal.querySelector('#dsp-cancel').addEventListener('click', close);
+    modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+    function showErr(msg) {
+      const err = modal.querySelector('#dsp-error');
+      err.textContent = msg;
+      err.style.display = 'block';
+    }
+    function clearErr() {
+      const err = modal.querySelector('#dsp-error');
+      err.style.display = 'none';
+    }
+
+    function renderImagePreviews() {
+      const c = modal.querySelector('#dsp-image-previews');
+      c.innerHTML = imageFiles.map((f, i) => {
+        const url = URL.createObjectURL(f);
+        return `
+          <div style="position:relative; width:64px; height:64px; border-radius:6px; overflow:hidden; border:1px solid #1F2937;">
+            <img src="${url}" style="width:100%; height:100%; object-fit:cover;">
+            <button type="button" data-idx="${i}" class="dsp-rm-img" style="position:absolute; top:2px; right:2px; width:20px; height:20px; background:rgba(0,0,0,0.7); border:none; color:#fff; border-radius:50%; cursor:pointer; font-size:12px; line-height:1; padding:0;">×</button>
+          </div>
+        `;
+      }).join('');
+      c.querySelectorAll('.dsp-rm-img').forEach(b => {
+        b.addEventListener('click', () => {
+          imageFiles.splice(parseInt(b.dataset.idx, 10), 1);
+          renderImagePreviews();
+        });
+      });
+    }
+
+    function renderVideoPreview() {
+      const c = modal.querySelector('#dsp-video-preview');
+      if (!videoFile) { c.innerHTML = ''; return; }
+      const sizeMb = (videoFile.size / 1024 / 1024).toFixed(1);
+      c.innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px; background:#0a0f1c; border:1px solid #1F2937; border-radius:8px; padding:10px 12px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3AABFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2" ry="2"/></svg>
+          <div style="flex:1; font-size:12.5px; color:#fff;">${escHtml(videoFile.name)} <span style="color:#6B7280;">· ${sizeMb}MB</span></div>
+          <button id="dsp-rm-video" type="button" style="background:transparent; border:none; color:#ff3a6e; cursor:pointer; font-size:18px;">×</button>
+        </div>
+      `;
+      modal.querySelector('#dsp-rm-video').addEventListener('click', () => {
+        videoFile = null;
+        renderVideoPreview();
+      });
+    }
+
+    modal.querySelector('#dsp-pick-images').addEventListener('click', () => {
+      modal.querySelector('#dsp-images').click();
+    });
+    modal.querySelector('#dsp-images').addEventListener('change', e => {
+      clearErr();
+      const newFiles = Array.from(e.target.files || []);
+      const slotsLeft = MAX_IMAGES - imageFiles.length;
+      if (newFiles.length > slotsLeft) {
+        showErr(`You can only add up to ${MAX_IMAGES} images total.`);
+      }
+      imageFiles = imageFiles.concat(newFiles.slice(0, slotsLeft));
+      renderImagePreviews();
+      e.target.value = '';
+    });
+
+    modal.querySelector('#dsp-pick-video').addEventListener('click', () => {
+      modal.querySelector('#dsp-video').click();
+    });
+    modal.querySelector('#dsp-video').addEventListener('change', e => {
+      clearErr();
+      const f = (e.target.files || [])[0];
+      if (!f) return;
+      const sizeMb = f.size / 1024 / 1024;
+      if (sizeMb > MAX_VIDEO_SIZE_MB) {
+        showErr(`Video too large (${sizeMb.toFixed(1)}MB). Max ${MAX_VIDEO_SIZE_MB}MB.`);
+        e.target.value = '';
+        return;
+      }
+      videoFile = f;
+      renderVideoPreview();
+      e.target.value = '';
+    });
+
+    modal.querySelector('#dsp-submit').addEventListener('click', async () => {
+      clearErr();
+      const reason = modal.querySelector('#dsp-reason').value.trim();
+      if (reason.length < 10) {
+        showErr('Description must be at least 10 characters.');
+        return;
+      }
+      if (!window.sb) { showErr('Database not connected.'); return; }
+      const { data: { user } } = await window.sb.auth.getUser();
+      if (!user) { showErr('You must be logged in.'); return; }
+
+      const submitBtn = modal.querySelector('#dsp-submit');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Uploading...';
+
+      try {
+        // Upload files to dispute-evidence bucket
+        const uploadedUrls = [];
+        const allFiles = [...imageFiles];
+        if (videoFile) allFiles.push(videoFile);
+
+        for (let i = 0; i < allFiles.length; i++) {
+          const file = allFiles[i];
+          submitBtn.textContent = `Uploading ${i + 1}/${allFiles.length}...`;
+          const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
+          const rand = Math.random().toString(36).substring(2, 8);
+          const path = `${user.id}/dispute-${Date.now()}-${rand}.${ext}`;
+          const { error: upErr } = await window.sb.storage
+            .from('dispute-evidence')
+            .upload(path, file, { cacheControl: '3600', upsert: false });
+          if (upErr) throw upErr;
+          const { data: pub } = window.sb.storage
+            .from('dispute-evidence')
+            .getPublicUrl(path);
+          uploadedUrls.push(pub.publicUrl);
+        }
+
+        submitBtn.textContent = 'Submitting...';
+        const { error: rpcErr } = await window.sb.rpc('open_dispute', {
+          p_order_id: order.id,
+          p_reason: reason,
+          p_evidence_files: uploadedUrls
+        });
+        if (rpcErr) throw rpcErr;
+
+        close();
+        await reload();
+        alert('Dispute submitted. Admin will review and respond.');
+      } catch (e) {
+        console.error('[dispute] submit failed', e);
+        showErr('Submit failed: ' + (e.message || e));
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit dispute';
+      }
+    });
+  }
+
+  async function boot() {
+    setupFilters();
+    await reload();
+    // Reload when auth state changes (login/logout)
+    if (window.sb && window.sb.auth) {
+      try { window.sb.auth.onAuthStateChange(() => reload()); } catch (e) {}
+    }
+  }
+
+  if (window.SITE_DATA_READY) window.SITE_DATA_READY.then(boot);
+  else document.addEventListener('DOMContentLoaded', boot);
+})();
+</script>
+
 <script>
 /* ============================================================
    POPUP COORDINATOR — only ONE popup open at a time.
