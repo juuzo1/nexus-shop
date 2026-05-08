@@ -2133,6 +2133,10 @@
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg>
                   Order History
                 </a>
+                <a class="auth-menu-item" href="transactions.html">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13"/><path d="m13 4 3 3-3 3"/><path d="M21 17H8"/><path d="m11 14-3 3 3 3"/></svg>
+                  Transactions
+                </a>
                 <a class="auth-menu-item" href="wishlist.html">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
                   Wishlist
@@ -2279,7 +2283,21 @@
 
     <div class="reviews-summary" id="reviews-summary"></div>
 
+    <!-- Sort dropdown -->
+    <div id="reviews-sort-bar" style="display:none; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+      <span style="color:var(--text-muted, #9CA3AF); font-size:12.5px; font-weight:600;">Sort by:</span>
+      <select id="reviews-sort" style="background:#0a0f1c; border:1px solid #1F2937; border-radius:8px; padding:7px 12px; color:#fff; font-size:13px; outline:none; font-family:inherit; cursor:pointer;">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="rating_desc">Highest rated</option>
+        <option value="rating_asc">Lowest rated</option>
+      </select>
+    </div>
+
     <div class="review-list" id="review-list"></div>
+
+    <!-- Pagination -->
+    <div id="reviews-pagination" style="display:none; gap:6px; justify-content:center; margin-top:18px; flex-wrap:wrap;"></div>
   </div>
 
   <!-- Similar products carousel -->
@@ -2398,6 +2416,7 @@ async function fetchProductFromDb(slug) {
         id, slug, name, description, long_description, base_price,
         theme, logo_class, logo_char, images,
         total_orders, completion_rate, like_rate, delivery_time,
+        likes_count, dislikes_count,
         is_featured, is_visible,
         sellers ( name, avatar_color, is_verified, total_orders )
       `)
@@ -2413,6 +2432,12 @@ async function fetchProductFromDb(slug) {
       .order('sort_order', { ascending: true });
 
     const seller = data.sellers || {};
+    // Compute real like% from ratings
+    const likes    = Number(data.likes_count) || 0;
+    const dislikes = Number(data.dislikes_count) || 0;
+    const totalRatings = likes + dislikes;
+    const likePct  = totalRatings > 0 ? (likes / totalRatings * 100) : 0;
+
     const product = {
       id:           data.id,
       db_id:        data.id,
@@ -2426,8 +2451,8 @@ async function fetchProductFromDb(slug) {
       images:       Array.isArray(data.images) ? data.images : [],
       price:        Number(data.base_price).toFixed(2),
       orders:       Number(data.total_orders || 0).toLocaleString('en-US'),
-      completion:   Number(data.completion_rate || 100).toFixed(0),
-      like:         Number(data.like_rate || 99).toFixed(2),
+      completion:   Number(data.completion_rate || 0).toFixed(0),
+      like:         likePct.toFixed(2),
       delivery:     data.delivery_time || 'Instant',
       seller:       seller.name || 'Seller',
       color:        seller.avatar_color || '#3AABFF',
@@ -2653,35 +2678,120 @@ function renderDescription(product) {
    REVIEWS — placeholder data, edit in admin once backend exists.
    When backend ready: fetch('/api/products/' + id + '/reviews')
    ============================================================ */
-const REVIEWS_PLACEHOLDER = [
-  { name: 'Marcus T.',     duration: '6 months',  stars: 5, days_ago: 2,  color: '#3AABFF',
-    text: "Delivery was instant — credentials worked first try. Switched from buying directly because the price difference is just ridiculous. Already on my second order from this seller." },
-  { name: 'Sofia R.',      duration: '1 month',   stars: 5, days_ago: 4,  color: '#EC4899',
-    text: "Was nervous about using a marketplace for the first time, but the escrow system actually held my payment until I confirmed everything worked. Smooth process, will definitely come back." },
-  { name: 'David K.',      duration: '12 months', stars: 4, days_ago: 7,  color: '#10B981',
-    text: "Took about 20 minutes for the seller to respond and deliver — slightly slower than advertised. But the account works perfectly and the long-term price is unbeatable. Knocking off one star for the wait." },
-  { name: 'Aisha N.',      duration: '3 months',  stars: 5, days_ago: 11, color: '#F59E0B',
-    text: "Fifth purchase from this seller. They're reliable, replacement guarantee is real (had one issue 2 months in, got a fresh account same day). Highly recommended." },
-  { name: 'Liam P.',       duration: '6 months',  stars: 5, days_ago: 18, color: '#A259FF',
-    text: "Honestly couldn't believe the price at first. Paid in USDC, got the account in under 5 minutes, full features. The buyer protection on the platform is what convinced me to try it." },
-  { name: 'Yuki H.',       duration: '1 month',   stars: 4, days_ago: 23, color: '#FA2D48',
-    text: "Worked great, just wish there was a way to extend the duration mid-subscription instead of buying again. Otherwise no complaints." }
-];
+/* ============================================================
+   REVIEWS — load real reviews from DB, sort + paginate (6 per page)
+   ============================================================ */
+const REVIEWS_PER_PAGE = 6;
+let REVIEWS_DATA = [];
+let REVIEWS_SORT = 'newest';
+let REVIEWS_PAGE = 1;
 
-function renderReviews() {
-  const reviews = REVIEWS_PLACEHOLDER;
-  const avg = reviews.reduce((s, r) => s + r.stars, 0) / reviews.length;
-  const total = reviews.length * 39 + 47;
+async function loadReviews(productId) {
+  if (!window.sb || !productId) {
+    REVIEWS_DATA = [];
+    paintReviews();
+    return;
+  }
+  try {
+    // Fetch reviews
+    const { data: revs, error } = await window.sb
+      .from('product_reviews')
+      .select('id, user_id, rating, comment, tier_label, created_at')
+      .eq('product_id', productId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
 
+    // Pull user display names + colors
+    const userIds = [...new Set((revs || []).map(r => r.user_id))];
+    const profMap = {};
+    if (userIds.length > 0) {
+      const { data: profs } = await window.sb
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', userIds);
+      (profs || []).forEach(p => { profMap[p.id] = p.display_name || 'User'; });
+    }
+
+    // Pretty colors based on user id hash
+    const COLORS = ['#3AABFF', '#EC4899', '#10B981', '#F59E0B', '#A259FF', '#FA2D48', '#22D3EE'];
+    function colorFor(id) {
+      let h = 0;
+      for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+      return COLORS[h % COLORS.length];
+    }
+
+    REVIEWS_DATA = (revs || []).map(r => ({
+      id: r.id,
+      name: profMap[r.user_id] || 'User',
+      color: colorFor(r.user_id),
+      stars: r.rating,
+      tier: r.tier_label || '',
+      text: r.comment,
+      created_at: r.created_at
+    }));
+  } catch (e) {
+    console.warn('[reviews] load failed', e);
+    REVIEWS_DATA = [];
+  }
+  REVIEWS_PAGE = 1;
+  paintReviews();
+}
+
+function sortReviews(list) {
+  const arr = list.slice();
+  arr.sort((a, b) => {
+    if (REVIEWS_SORT === 'newest')      return new Date(b.created_at) - new Date(a.created_at);
+    if (REVIEWS_SORT === 'oldest')      return new Date(a.created_at) - new Date(b.created_at);
+    if (REVIEWS_SORT === 'rating_desc') return b.stars - a.stars || (new Date(b.created_at) - new Date(a.created_at));
+    if (REVIEWS_SORT === 'rating_asc')  return a.stars - b.stars || (new Date(b.created_at) - new Date(a.created_at));
+    return 0;
+  });
+  return arr;
+}
+
+function timeAgo(iso) {
+  const sec = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+  if (sec < 60)        return 'just now';
+  if (sec < 3600)      return Math.floor(sec / 60) + ' min ago';
+  if (sec < 86400)     return Math.floor(sec / 3600) + ' hours ago';
+  if (sec < 86400 * 2) return 'yesterday';
+  if (sec < 86400 * 30) return Math.floor(sec / 86400) + ' days ago';
+  if (sec < 86400 * 365) return Math.floor(sec / (86400 * 30)) + ' months ago';
+  return Math.floor(sec / (86400 * 365)) + ' years ago';
+}
+
+function paintReviews() {
+  const reviews = sortReviews(REVIEWS_DATA);
+  const total = reviews.length;
+  const summary = document.getElementById('reviews-summary');
+  const list    = document.getElementById('review-list');
+  const sortBar = document.getElementById('reviews-sort-bar');
+  const pager   = document.getElementById('reviews-pagination');
+
+  // Summary
+  if (total === 0) {
+    summary.innerHTML = `
+      <div class="rating-big">
+        <div class="rating-big-num">0.0<span class="max">/5</span></div>
+        <div class="rating-big-stars">${[1,2,3,4,5].map(() => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>').join('')}</div>
+        <div class="rating-big-count">No reviews yet</div>
+      </div>
+      <div class="rating-bars">${[5,4,3,2,1].map(s => `<div class="rating-bar-row"><span class="star-num">${s}</span><div class="rating-bar-track"><div class="rating-bar-fill" style="width: 0%;"></div></div><span>0%</span></div>`).join('')}</div>
+    `;
+    list.innerHTML = '<div style="padding:32px; text-align:center; color:var(--text-muted, #9CA3AF); font-size:14px;">Be the first to review this product after purchasing!</div>';
+    if (sortBar) sortBar.style.display = 'none';
+    if (pager) { pager.style.display = 'none'; pager.innerHTML = ''; }
+    return;
+  }
+
+  const avg = reviews.reduce((s, r) => s + r.stars, 0) / total;
   const dist = [5, 4, 3, 2, 1].map(n => {
     const count = reviews.filter(r => r.stars === n).length;
-    return { stars: n, pct: Math.round(count / reviews.length * 100) };
+    return { stars: n, pct: Math.round(count / total * 100) };
   });
-
   const starsHtml = [1,2,3,4,5].map(n =>
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${n <= Math.round(avg) ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
   ).join('');
-
   const barsHtml = dist.map(d => `
     <div class="rating-bar-row">
       <span class="star-num">${d.stars}</span>
@@ -2689,42 +2799,95 @@ function renderReviews() {
       <span>${d.pct}%</span>
     </div>`).join('');
 
-  document.getElementById('reviews-summary').innerHTML = `
+  summary.innerHTML = `
     <div class="rating-big">
       <div class="rating-big-num">${avg.toFixed(1)}<span class="max">/5</span></div>
       <div class="rating-big-stars">${starsHtml}</div>
-      <div class="rating-big-count">${total.toLocaleString()} reviews</div>
+      <div class="rating-big-count">${total.toLocaleString()} review${total === 1 ? '' : 's'}</div>
     </div>
     <div class="rating-bars">${barsHtml}</div>
-    <button class="write-review-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
-      Write a review
-    </button>`;
+  `;
 
-  const productName = window.__currentProduct.name;
-  document.getElementById('review-list').innerHTML = reviews.map(r => {
+  // Sort bar
+  if (sortBar) sortBar.style.display = 'flex';
+
+  // Pagination
+  const pageCount = Math.ceil(total / REVIEWS_PER_PAGE);
+  if (REVIEWS_PAGE > pageCount) REVIEWS_PAGE = 1;
+  const startIdx = (REVIEWS_PAGE - 1) * REVIEWS_PER_PAGE;
+  const pageItems = reviews.slice(startIdx, startIdx + REVIEWS_PER_PAGE);
+
+  const productName = window.__currentProduct ? window.__currentProduct.name : '';
+
+  list.innerHTML = pageItems.map(r => {
     const stars = [1,2,3,4,5].map(n =>
       `<svg class="${n <= r.stars ? 'filled' : 'empty'}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
     ).join('');
-    const dateLabel = r.days_ago === 1 ? 'yesterday' : (r.days_ago < 30 ? r.days_ago + ' days ago' : Math.floor(r.days_ago / 30) + ' months ago');
     return `
       <div class="review-item">
         <div class="review-head">
-          <div class="review-avatar" style="background: linear-gradient(135deg, ${esc(r.color)}, ${esc(r.color)}cc);">${esc(r.name.charAt(0))}</div>
+          <div class="review-avatar" style="background: linear-gradient(135deg, ${esc(r.color)}, ${esc(r.color)}cc);">${esc(r.name.charAt(0).toUpperCase())}</div>
           <div class="review-meta">
             <div class="review-name">${esc(r.name)}</div>
             <div class="review-product">
               <span class="product-tag">${esc(productName)}</span>
-              <span class="dot-sep">·</span>
-              <span>${esc(r.duration)}</span>
+              ${r.tier ? `<span class="dot-sep">·</span><span>${esc(r.tier)}</span>` : ''}
             </div>
             <div class="review-stars">${stars}</div>
           </div>
-          <div class="review-date">${dateLabel}</div>
+          <div class="review-date">${esc(timeAgo(r.created_at))}</div>
         </div>
         <div class="review-body">${esc(r.text)}</div>
       </div>`;
   }).join('');
+
+  // Pagination controls
+  if (pager) {
+    if (pageCount <= 1) {
+      pager.style.display = 'none';
+      pager.innerHTML = '';
+    } else {
+      pager.style.display = 'flex';
+      let html = '';
+      // Prev
+      html += `<button class="rev-page-btn" data-page="${REVIEWS_PAGE - 1}" ${REVIEWS_PAGE === 1 ? 'disabled' : ''} style="background:#0a0f1c; border:1px solid #1F2937; color:${REVIEWS_PAGE === 1 ? '#374151' : '#9CA3AF'}; padding:7px 12px; border-radius:8px; font-size:13px; cursor:${REVIEWS_PAGE === 1 ? 'not-allowed' : 'pointer'}; font-family:inherit;">‹</button>`;
+      for (let i = 1; i <= pageCount; i++) {
+        const active = i === REVIEWS_PAGE;
+        html += `<button class="rev-page-btn" data-page="${i}" style="background:${active ? 'linear-gradient(135deg,#3A7BD5,#3AABFF)' : '#0a0f1c'}; border:1px solid ${active ? '#3AABFF' : '#1F2937'}; color:${active ? '#fff' : '#9CA3AF'}; padding:7px 12px; border-radius:8px; font-size:13px; font-weight:${active ? '700' : '500'}; cursor:pointer; min-width:36px; font-family:inherit;">${i}</button>`;
+      }
+      html += `<button class="rev-page-btn" data-page="${REVIEWS_PAGE + 1}" ${REVIEWS_PAGE === pageCount ? 'disabled' : ''} style="background:#0a0f1c; border:1px solid #1F2937; color:${REVIEWS_PAGE === pageCount ? '#374151' : '#9CA3AF'}; padding:7px 12px; border-radius:8px; font-size:13px; cursor:${REVIEWS_PAGE === pageCount ? 'not-allowed' : 'pointer'}; font-family:inherit;">›</button>`;
+      pager.innerHTML = html;
+
+      pager.querySelectorAll('.rev-page-btn').forEach(b => {
+        b.addEventListener('click', () => {
+          if (b.disabled) return;
+          REVIEWS_PAGE = parseInt(b.dataset.page);
+          paintReviews();
+          // Scroll to top of reviews
+          document.getElementById('review-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+  }
+}
+
+// Wire sort dropdown once
+document.addEventListener('DOMContentLoaded', () => {
+  const sortSel = document.getElementById('reviews-sort');
+  if (sortSel) {
+    sortSel.addEventListener('change', e => {
+      REVIEWS_SORT = e.target.value;
+      REVIEWS_PAGE = 1;
+      paintReviews();
+    });
+  }
+});
+
+// Stub keeping old API: callers do `renderReviews()` after product loads.
+function renderReviews() {
+  const productId = window.__currentProduct && window.__currentProduct.db_id;
+  if (productId) loadReviews(productId);
+  else paintReviews();
 }
 
 /* ============================================================
@@ -3706,15 +3869,29 @@ SITE_DATA_READY.then(boot);
     if (cta) {
       e.preventDefault();
       e.stopPropagation();
-      openModal();
+      if (typeof window.openWalletModal === 'function') {
+        window.openWalletModal();
+      }
     }
   });
   closeBtn.addEventListener('click', closeModal);
   backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal(); });
 
-  // Placeholder action handlers
-  ['wallet-withdraw','wallet-deposit','wallet-buy-submit','wallet-swap-preview'].forEach(id => {
+  // Action handlers
+  const depositBtn = document.getElementById('wallet-deposit');
+  if (depositBtn) {
+    depositBtn.addEventListener('click', () => {
+      const walletBtn = document.getElementById('wallet-btn');
+      if (walletBtn) walletBtn.classList.remove('open');
+      if (typeof window.openDepositModal === 'function') {
+        window.openDepositModal();
+      } else {
+        console.warn('[wallet] openDepositModal not loaded');
+      }
+    });
+  }
+  ['wallet-withdraw','wallet-buy-submit','wallet-swap-preview'].forEach(id => {
     const btn = document.getElementById(id);
     if (btn) btn.addEventListener('click', () => console.log('[wallet]', id));
   });
@@ -3893,8 +4070,10 @@ SITE_DATA_READY.then(boot);
 
   trigger.addEventListener('click', e => {
     e.stopPropagation();
-    if (wrap.classList.contains('open')) close();
-    else { paintList(searchEl.value); open(); searchEl.focus(); }
+    e.preventDefault();
+    if (typeof window.openWalletModal === 'function') {
+      window.openWalletModal();
+    }
   });
 
   // Stop dropdown clicks from bubbling to outside-close

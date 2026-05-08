@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Order History — Nexus.Market</title>
+<title>Transactions — Nexus.Market</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -2735,51 +2735,6 @@
     border-color: #F59E0B;
     color: white;
   }
-  .order-btn-rate {
-    padding: 7px 10px !important;
-    background: var(--bg-elevated, #1A2436);
-    border-color: var(--border, #1F2937);
-    color: var(--text-muted, #9CA3AF);
-  }
-  .order-btn-rate:hover {
-    border-color: var(--accent-blue, #3AABFF);
-    color: var(--text-primary, #fff);
-  }
-  .order-btn-rate svg {
-    width: 16px; height: 16px;
-  }
-  .order-btn-liked {
-    background: rgba(16, 185, 129, 0.12) !important;
-    border-color: rgba(16, 185, 129, 0.4) !important;
-    color: #10B981 !important;
-  }
-  .order-btn-disliked {
-    background: rgba(255, 58, 110, 0.1) !important;
-    border-color: rgba(255, 58, 110, 0.4) !important;
-    color: #ff3a6e !important;
-  }
-  .order-btn-review {
-    background: rgba(58, 171, 255, 0.1);
-    border-color: rgba(58, 171, 255, 0.35);
-    color: #3AABFF;
-  }
-  .order-btn-review:hover {
-    background: rgba(58, 171, 255, 0.18);
-    border-color: #3AABFF;
-  }
-  .order-btn-reviewed {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 13px;
-    border-radius: 7px;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.35);
-    color: #10B981;
-    font-size: 12.5px;
-    font-weight: 600;
-  }
-  .order-btn-reviewed svg { width: 14px; height: 14px; }
   .order-btn-pending-dispute {
     display: inline-flex;
     align-items: center;
@@ -3006,40 +2961,40 @@
   </div>
 </nav>
 
-<!-- ============= ORDERS PAGE ============= -->
+<!-- ============= TRANSACTIONS PAGE ============= -->
 <section class="orders-page">
   <div class="container">
     <div class="orders-header">
       <div>
-        <h1 class="orders-title">Order History</h1>
-        <p class="orders-sub">All your purchases on Nexus.Market.</p>
+        <h1 class="orders-title">Transactions</h1>
+        <p class="orders-sub">Your deposit &amp; withdrawal history.</p>
       </div>
       <div class="orders-search">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="search" id="orders-search-input" placeholder="Search by order ID or product…" autocomplete="off">
+        <input type="search" id="tx-search-input" placeholder="Search by network, address, or note…" autocomplete="off">
       </div>
     </div>
 
     <!-- Filter chips -->
-    <div class="orders-filters" id="orders-filters">
-      <button class="ofilter active" data-filter="all">All <span class="ofilter-count" id="cnt-all">0</span></button>
-      <button class="ofilter" data-filter="completed">Completed <span class="ofilter-count" id="cnt-completed">0</span></button>
-      <button class="ofilter" data-filter="pending">Pending <span class="ofilter-count" id="cnt-pending">0</span></button>
-      <button class="ofilter" data-filter="refunded">Refunded <span class="ofilter-count" id="cnt-refunded">0</span></button>
-      <button class="ofilter" data-filter="disputed">Disputed <span class="ofilter-count" id="cnt-disputed">0</span></button>
+    <div class="orders-filters" id="tx-filters">
+      <button class="ofilter active" data-filter="all">All <span class="ofilter-count" id="tx-cnt-all">0</span></button>
+      <button class="ofilter" data-filter="deposit">Deposits <span class="ofilter-count" id="tx-cnt-deposit">0</span></button>
+      <button class="ofilter" data-filter="withdraw">Withdrawals <span class="ofilter-count" id="tx-cnt-withdraw">0</span></button>
+      <button class="ofilter" data-filter="pending">Pending <span class="ofilter-count" id="tx-cnt-pending">0</span></button>
+      <button class="ofilter" data-filter="completed">Completed <span class="ofilter-count" id="tx-cnt-completed">0</span></button>
     </div>
 
-    <!-- Orders list -->
-    <div id="orders-list"></div>
+    <!-- Transactions list -->
+    <div id="tx-list"></div>
 
     <!-- Empty state -->
-    <div id="orders-empty" class="orders-empty" style="display:none">
+    <div id="tx-empty" class="orders-empty" style="display:none">
       <div class="orders-empty-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13"/><path d="m13 4 3 3-3 3"/><path d="M21 17H8"/><path d="m11 14-3 3 3 3"/></svg>
       </div>
-      <h3>No orders yet</h3>
-      <p>Your purchase history will appear here once you place your first order.</p>
-      <a href="marketplace.html" class="orders-empty-btn">Browse marketplace</a>
+      <h3>No transactions yet</h3>
+      <p>Deposits and withdrawals will appear here once you make your first one.</p>
+      <button type="button" class="orders-empty-btn" onclick="if(window.openWalletModal)window.openWalletModal('deposit')">Make a deposit</button>
     </div>
   </div>
 </section>
@@ -4497,11 +4452,9 @@ SITE_DATA_READY.then(() => {
 
 <script>
 /* ============================================================
-   ORDERS PAGE LOGIC
-   Mock data for now; will wire to Supabase orders table later.
+   TRANSACTIONS PAGE — list user's deposits + withdrawals
    ============================================================ */
 (function() {
-  // Real orders from DB
   const COIN_COLORS = { USDT: '#26A17B', USDC: '#2775CA' };
 
   function escHtml(s) {
@@ -4515,239 +4468,139 @@ SITE_DATA_READY.then(() => {
     const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} · ${time}`;
   }
+  function shortAddr(s) {
+    if (!s) return '';
+    return s.length > 18 ? s.slice(0,8) + '...' + s.slice(-6) : s;
+  }
 
-  // Map DB status → UI status filter buckets
-  const STATUS_MAP = {
-    in_escrow: 'pending',
-    delivered: 'pending',   // delivered (waiting buyer confirm) treated as pending
-    completed: 'completed',
-    refunded:  'refunded',
-    disputed:  'disputed'
-  };
-
-  const STATUS_LABEL = {
-    in_escrow: 'pending',
-    delivered: 'delivered',
-    completed: 'completed',
-    refunded:  'refunded',
-    disputed:  'disputed'
-  };
-
-  const STATUS_ICONS = {
-    completed: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
-    pending:   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-    delivered: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-    refunded:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>',
-    disputed:  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>'
-  };
-
-  let ORDERS = [];   // raw DB rows joined with product
+  let TX = [];   // unified array
   let activeFilter = 'all';
   let searchTerm = '';
 
-  async function fetchOrders() {
+  async function fetchTransactions() {
     if (!window.sb) return [];
     const { data: { user } } = await window.sb.auth.getUser();
     if (!user) return [];
 
-    // Fetch orders with product info
-    const { data, error } = await window.sb
-      .from('orders')
-      .select(`
-        id, order_number, buyer_id, seller_id, product_id, tier_label,
-        qty, amount_usd, coin, status, delivered_at, completed_at, created_at,
-        products ( id, slug, name, theme, logo_class, logo_char, images )
-      `)
-      .eq('buyer_id', user.id)
+    // Manual deposits
+    const depPromise = window.sb.from('manual_deposit_requests')
+      .select('id, network, sender_address, claimed_amount, approved_amount, target_coin, status, admin_note, resolved_at, created_at')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
-    if (error) {
-      console.warn('[orders] fetch failed', error);
-      return [];
-    }
-    const orders = data || [];
 
-    // Load disputes for any disputed orders → mark _dispute_resolved
-    const disputedOrderIds = orders.filter(o => o.status === 'disputed').map(o => o.id);
-    if (disputedOrderIds.length > 0) {
-      const { data: disps } = await window.sb
-        .from('disputes')
-        .select('order_id, status')
-        .in('order_id', disputedOrderIds);
-      const dispMap = {};
-      (disps || []).forEach(d => { dispMap[d.order_id] = d.status; });
-      orders.forEach(o => {
-        if (o.status === 'disputed') {
-          const ds = dispMap[o.id];
-          o._dispute_resolved = ds && ['resolved_refund','resolved_release','rejected'].includes(ds);
-        }
-      });
-    }
+    // NOWPayments deposits
+    const autoDepPromise = window.sb.from('deposit_invoices')
+      .select('id, amount_usd, target_coin, status, credited_at, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
 
-    // Load my ratings for products in these orders
-    const productIds = [...new Set(orders.map(o => o.product_id).filter(Boolean))];
-    window.MY_RATINGS = {};
-    if (productIds.length > 0) {
-      const { data: ratings } = await window.sb
-        .from('product_ratings')
-        .select('product_id, rating')
-        .eq('user_id', user.id)
-        .in('product_id', productIds);
-      (ratings || []).forEach(r => { window.MY_RATINGS[r.product_id] = r.rating; });
-    }
+    // Withdrawals
+    const wdPromise = window.sb.from('withdraw_requests')
+      .select('id, coin, network, recipient_address, amount, status, admin_note, tx_hash, resolved_at, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
 
-    // Load my reviews for these orders (one per order)
-    const orderIds = orders.map(o => o.id);
-    window.MY_REVIEWS = {};
-    if (orderIds.length > 0) {
-      const { data: revs } = await window.sb
-        .from('product_reviews')
-        .select('order_id, rating, comment, created_at')
-        .eq('user_id', user.id)
-        .in('order_id', orderIds);
-      (revs || []).forEach(r => { window.MY_REVIEWS[r.order_id] = r; });
-    }
+    const [depRes, autoDepRes, wdRes] = await Promise.all([depPromise, autoDepPromise, wdPromise]);
 
-    return orders;
+    const out = [];
+
+    (depRes.data || []).forEach(d => out.push({
+      kind: 'deposit',
+      source: 'manual',
+      id: d.id,
+      coin: d.target_coin,
+      network: d.network,
+      amount: d.approved_amount != null ? d.approved_amount : d.claimed_amount,
+      status: d.status === 'approved' ? 'completed' : d.status,
+      note: d.admin_note,
+      created_at: d.created_at,
+      detail: 'From: ' + shortAddr(d.sender_address),
+      fullDetail: d.sender_address
+    }));
+
+    (autoDepRes.data || []).forEach(d => out.push({
+      kind: 'deposit',
+      source: 'nowpayments',
+      id: d.id,
+      coin: d.target_coin,
+      network: 'NOWPayments',
+      amount: d.amount_usd,
+      status: d.status === 'finished' ? 'completed' : (d.status === 'failed' || d.status === 'expired' ? 'rejected' : 'pending'),
+      note: null,
+      created_at: d.created_at,
+      detail: 'NOWPayments invoice',
+      fullDetail: null
+    }));
+
+    (wdRes.data || []).forEach(w => out.push({
+      kind: 'withdraw',
+      source: 'manual',
+      id: w.id,
+      coin: w.coin,
+      network: w.network,
+      amount: w.amount,
+      status: w.status === 'approved' ? 'completed' : w.status,
+      note: w.admin_note,
+      created_at: w.created_at,
+      detail: 'To: ' + shortAddr(w.recipient_address),
+      fullDetail: w.recipient_address,
+      tx_hash: w.tx_hash
+    }));
+
+    out.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    return out;
   }
 
-  function renderOrder(o) {
-    const p = o.products || {};
-    const cover = (p.images && p.images[0]) || null;
-    const logo  = p.logo_char || (p.name || '?').charAt(0).toUpperCase();
-    const slug  = p.slug || '';
-    const coinColor = COIN_COLORS[o.coin] || '#3AABFF';
-    const status = o.status; // raw DB status
-    const filterStatus = STATUS_MAP[status] || 'pending';
-    const label = STATUS_LABEL[status] || status;
+  const STATUS_BADGE = {
+    pending:   '<span style="background:rgba(245,158,11,0.18); color:#F59E0B; padding:3px 10px; border-radius:999px; font-size:11.5px; font-weight:700; letter-spacing:0.04em;">PENDING</span>',
+    completed: '<span style="background:rgba(16,185,129,0.15); color:#10B981; padding:3px 10px; border-radius:999px; font-size:11.5px; font-weight:700; letter-spacing:0.04em;">COMPLETED</span>',
+    rejected:  '<span style="background:rgba(255,58,110,0.15); color:#ff3a6e; padding:3px 10px; border-radius:999px; font-size:11.5px; font-weight:700; letter-spacing:0.04em;">REJECTED</span>'
+  };
 
-    // Cover/logo for the item
-    const itemImg = cover
-      ? `<div class="order-item-img" style="background-image:url('${escHtml(cover)}');background-size:cover;background-position:center"></div>`
-      : `<div class="order-item-img" style="background:linear-gradient(135deg,#3AABFF,#3A7BD5);">${escHtml(logo)}</div>`;
-
-    // Buttons depend on status
-    let actionsHtml = `
-      <button class="order-btn order-btn-primary" data-action="details" data-id="${escHtml(o.id)}">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        View details
-      </button>
-    `;
-    // Confirm + Dispute only for delivered (in 5-day warranty)
-    if (status === 'delivered') {
-      const deliveredAt = o.delivered_at ? new Date(o.delivered_at).getTime() : 0;
-      const warrantyEnd = deliveredAt + 5 * 24 * 60 * 60 * 1000;
-      const stillInWarranty = deliveredAt > 0 && Date.now() < warrantyEnd;
-      if (stillInWarranty) {
-        actionsHtml += `
-          <button class="order-btn order-btn-confirm" data-action="confirm" data-id="${escHtml(o.id)}">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Confirm
-          </button>
-          <button class="order-btn order-btn-dispute" data-action="dispute" data-id="${escHtml(o.id)}">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-            Dispute
-          </button>
-        `;
-      }
-    } else if (status === 'disputed') {
-      // Order has open dispute — show "Dispute pending" badge instead of action buttons
-      actionsHtml += `
-        <span class="order-btn-pending-dispute">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Dispute under review
-        </span>
-      `;
-    }
-
-    // Like/Dislike buttons — show for completed/refunded orders, OR disputed orders that are resolved
-    const canRate = (status === 'completed' || status === 'refunded') ||
-                    (status === 'disputed' && o._dispute_resolved);
-    if (canRate && p.id) {
-      const myRating = window.MY_RATINGS && window.MY_RATINGS[p.id];
-      const liked = myRating === 1;
-      const disliked = myRating === -1;
-      actionsHtml += `
-        <button class="order-btn order-btn-rate ${liked ? 'order-btn-liked' : ''}" data-action="like" data-id="${escHtml(o.id)}" data-product-id="${escHtml(p.id)}" title="Like this product">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${liked ? '#10B981' : 'none'}" stroke="${liked ? '#10B981' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7"/></svg>
-        </button>
-        <button class="order-btn order-btn-rate ${disliked ? 'order-btn-disliked' : ''}" data-action="dislike" data-id="${escHtml(o.id)}" data-product-id="${escHtml(p.id)}" title="Dislike this product">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${disliked ? '#ff3a6e' : 'none'}" stroke="${disliked ? '#ff3a6e' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H17"/></svg>
-        </button>
-      `;
-
-      // Write review button — show only if user hasn't reviewed this order yet
-      const hasReview = window.MY_REVIEWS && window.MY_REVIEWS[o.id];
-      if (hasReview) {
-        // Show "Reviewed" pill (not editable)
-        const stars = '★'.repeat(hasReview.rating) + '☆'.repeat(5 - hasReview.rating);
-        actionsHtml += `
-          <span class="order-btn-reviewed" title="Reviewed">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Reviewed <span style="color:#FBBF24; margin-left:4px;">${stars}</span>
-          </span>
-        `;
-      } else {
-        actionsHtml += `
-          <button class="order-btn order-btn-review" data-action="review" data-id="${escHtml(o.id)}" data-product-id="${escHtml(p.id)}" data-product-name="${escHtml(p.name || '')}" data-tier="${escHtml(o.tier_label || '')}">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-            Write review
-          </button>
-        `;
-      }
-    }
+  function renderTx(t) {
+    const isDep = t.kind === 'deposit';
+    const sign = isDep ? '+' : '−';
+    const color = isDep ? '#10B981' : '#F59E0B';
+    const iconBg = isDep ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)';
+    const iconColor = isDep ? '#10B981' : '#F59E0B';
+    const arrowSvg = isDep
+      ? '<polyline points="19 12 12 19 5 12"/><line x1="12" x2="12" y1="5" y2="19"/>'
+      : '<polyline points="5 12 12 5 19 12"/><line x1="12" x2="12" y1="19" y2="5"/>';
 
     return `
-      <div class="order-card" data-status="${escHtml(filterStatus)}" data-search="${escHtml((o.order_number + ' ' + (p.name||'')).toLowerCase())}">
-        <div class="order-card-head">
-          <div>
-            <div class="order-id">Order #${escHtml(o.order_number)}</div>
-            <div class="order-date">Placed ${escHtml(fmtDate(o.created_at))}</div>
-          </div>
-          <span class="order-status-badge ${escHtml(filterStatus)}">${STATUS_ICONS[label] || STATUS_ICONS[filterStatus] || ''} ${escHtml(label)}</span>
+      <div style="background:#131B2D; border:1px solid #1F2937; border-radius:12px; padding:18px; margin-bottom:12px; display:flex; align-items:center; gap:16px;">
+        <div style="width:44px; height:44px; border-radius:50%; background:${iconBg}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${arrowSvg}</svg>
         </div>
-
-        <div class="order-items">
-          <div class="order-item-row">
-            ${itemImg}
-            <div>
-              <a class="order-item-name" href="product.html?slug=${encodeURIComponent(slug)}">${escHtml(p.name || 'Unknown product')}</a>
-              <div class="order-item-meta">${escHtml(o.tier_label || 'Base')} · Qty ${o.qty}</div>
-            </div>
-            <span class="order-item-price">$${Number(o.amount_usd).toFixed(2)}</span>
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:6px; flex-wrap:wrap;">
+            <span style="color:#fff; font-weight:600; font-size:15px;">${isDep ? 'Deposit' : 'Withdrawal'} <span style="color:#9CA3AF; font-weight:500; font-size:12.5px; margin-left:6px;">via ${escHtml(t.network)}</span></span>
+            <span style="color:${color}; font-weight:700; font-size:16px;">${sign}${parseFloat(t.amount).toFixed(2)} ${escHtml(t.coin)}</span>
           </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+            <span style="color:#9CA3AF; font-size:12.5px; font-family:monospace;" title="${escHtml(t.fullDetail || '')}">${escHtml(t.detail)}</span>
+            <span style="color:#6B7280; font-size:12.5px;">${fmtDate(t.created_at)}</span>
+          </div>
+          ${t.note ? `<div style="color:#9CA3AF; font-size:12px; margin-top:6px; font-style:italic;">${escHtml(t.note)}</div>` : ''}
+          ${t.tx_hash ? `<div style="color:#6B7280; font-size:11.5px; margin-top:4px; font-family:monospace;">TX: ${escHtml(t.tx_hash.slice(0,18))}...</div>` : ''}
         </div>
-
-        <div class="order-card-foot">
-          <div class="order-payment">
-            <div class="order-payment-row">
-              <span class="order-payment-label">Payment:</span>
-              <span class="order-payment-coin">
-                <span class="order-payment-coin-icon" style="background:${coinColor}">${escHtml(o.coin.charAt(0))}</span>
-                ${escHtml(o.coin)}
-              </span>
-            </div>
-          </div>
-
-          <div class="order-totals">
-            <div class="order-total-row">
-              1 item (${o.qty} qty) <strong>$${Number(o.amount_usd).toFixed(2)}</strong>
-            </div>
-            <div class="order-actions">
-              ${actionsHtml}
-            </div>
-          </div>
-        </div>
-      </div>`;
+        <div style="flex-shrink:0;">${STATUS_BADGE[t.status] || ''}</div>
+      </div>
+    `;
   }
 
   function applyFilters() {
-    const list = document.getElementById('orders-list');
-    const empty = document.getElementById('orders-empty');
-    const filtered = ORDERS.filter(o => {
-      const filterStatus = STATUS_MAP[o.status] || 'pending';
-      if (activeFilter !== 'all' && filterStatus !== activeFilter) return false;
+    const list = document.getElementById('tx-list');
+    const empty = document.getElementById('tx-empty');
+    if (!list || !empty) return;
+
+    const filtered = TX.filter(t => {
+      if (activeFilter === 'deposit' && t.kind !== 'deposit') return false;
+      if (activeFilter === 'withdraw' && t.kind !== 'withdraw') return false;
+      if (activeFilter === 'pending' && t.status !== 'pending') return false;
+      if (activeFilter === 'completed' && t.status !== 'completed') return false;
       if (searchTerm) {
-        const haystack = (o.order_number + ' ' + ((o.products && o.products.name) || '')).toLowerCase();
+        const haystack = ((t.network || '') + ' ' + (t.fullDetail || '') + ' ' + (t.note || '')).toLowerCase();
         if (!haystack.includes(searchTerm.toLowerCase())) return false;
       }
       return true;
@@ -4758,21 +4611,23 @@ SITE_DATA_READY.then(() => {
       empty.style.display = '';
     } else {
       empty.style.display = 'none';
-      list.innerHTML = filtered.map(renderOrder).join('');
+      list.innerHTML = filtered.map(renderTx).join('');
     }
   }
 
   function updateCounts() {
-    const buckets = { all: ORDERS.length, completed: 0, pending: 0, refunded: 0, disputed: 0 };
-    ORDERS.forEach(o => {
-      const f = STATUS_MAP[o.status] || 'pending';
-      buckets[f] = (buckets[f] || 0) + 1;
-    });
-    document.getElementById('cnt-all').textContent       = buckets.all;
-    document.getElementById('cnt-completed').textContent = buckets.completed;
-    document.getElementById('cnt-pending').textContent   = buckets.pending;
-    document.getElementById('cnt-refunded').textContent  = buckets.refunded;
-    document.getElementById('cnt-disputed').textContent  = buckets.disputed;
+    const buckets = {
+      all: TX.length,
+      deposit: TX.filter(t => t.kind === 'deposit').length,
+      withdraw: TX.filter(t => t.kind === 'withdraw').length,
+      pending: TX.filter(t => t.status === 'pending').length,
+      completed: TX.filter(t => t.status === 'completed').length
+    };
+    document.getElementById('tx-cnt-all').textContent       = buckets.all;
+    document.getElementById('tx-cnt-deposit').textContent   = buckets.deposit;
+    document.getElementById('tx-cnt-withdraw').textContent  = buckets.withdraw;
+    document.getElementById('tx-cnt-pending').textContent   = buckets.pending;
+    document.getElementById('tx-cnt-completed').textContent = buckets.completed;
   }
 
   function setupFilters() {
@@ -4785,410 +4640,24 @@ SITE_DATA_READY.then(() => {
       });
     });
 
-    const searchInput = document.getElementById('orders-search-input');
+    const searchInput = document.getElementById('tx-search-input');
     if (searchInput) {
       searchInput.addEventListener('input', e => {
         searchTerm = e.target.value;
         applyFilters();
       });
     }
-
-    document.addEventListener('click', async e => {
-      const btn = e.target.closest('[data-action]');
-      if (!btn) return;
-      const id = btn.dataset.id;
-      const action = btn.dataset.action;
-
-      if (action === 'details') {
-        alert('Order details page — coming soon.');
-        return;
-      }
-
-      if (action === 'confirm') {
-        if (!confirm('Confirm you have received and verified this product? This will release funds to the seller.')) return;
-        btn.disabled = true; btn.textContent = '...';
-        try {
-          const { error } = await window.sb.rpc('confirm_order', { p_order_id: id });
-          if (error) throw error;
-          await reload();
-          if (typeof window.refreshWalletBalances === 'function') window.refreshWalletBalances();
-        } catch (e) {
-          alert('Confirm failed: ' + (e.message || e));
-          btn.disabled = false;
-        }
-        return;
-      }
-
-      if (action === 'dispute') {
-        const order = ORDERS.find(o => o.id === id);
-        if (!order) return;
-        openDisputeModal(order);
-        return;
-      }
-
-      if (action === 'like' || action === 'dislike') {
-        const productId = btn.dataset.productId;
-        const newRating = action === 'like' ? 1 : -1;
-        const currentRating = window.MY_RATINGS && window.MY_RATINGS[productId];
-        // Toggle: if user clicks same rating they already gave → remove it (rating = 0)
-        const sendValue = currentRating === newRating ? 0 : newRating;
-
-        btn.disabled = true;
-        try {
-          const { error } = await window.sb.rpc('rate_product', {
-            p_order_id: id,
-            p_rating: sendValue
-          });
-          if (error) throw error;
-          // Update local state and re-render this card
-          if (sendValue === 0) {
-            delete window.MY_RATINGS[productId];
-          } else {
-            window.MY_RATINGS[productId] = sendValue;
-          }
-          applyFilters();
-        } catch (e) {
-          console.error('[rate]', e);
-          alert('Rate failed: ' + (e.message || e));
-          btn.disabled = false;
-        }
-        return;
-      }
-
-      if (action === 'review') {
-        const order = ORDERS.find(o => o.id === id);
-        if (!order) return;
-        openReviewModal(order);
-        return;
-      }
-    });
   }
 
   async function reload() {
-    // Lazy: trigger auto-complete for any orders past 5-day warranty
-    if (window.sb) {
-      try { await window.sb.rpc('auto_complete_expired_orders'); } catch (e) {}
-    }
-    ORDERS = await fetchOrders();
+    TX = await fetchTransactions();
     updateCounts();
     applyFilters();
-  }
-
-  // ===== Review Modal =====
-  function openReviewModal(order) {
-    const existing = document.getElementById('review-modal');
-    if (existing) existing.remove();
-
-    let selectedRating = 0;
-    const productName = (order.products && order.products.name) || 'product';
-    const tier = order.tier_label || '';
-
-    const modal = document.createElement('div');
-    modal.id = 'review-modal';
-    modal.style.cssText = 'position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:20px; overflow-y:auto;';
-    document.body.appendChild(modal);
-    document.body.style.overflow = 'hidden';
-
-    function close() { modal.remove(); document.body.style.overflow = ''; }
-
-    function render() {
-      const starsHtml = [1,2,3,4,5].map(n => {
-        const filled = n <= selectedRating;
-        return `<button type="button" class="rev-star" data-star="${n}" style="background:transparent; border:none; cursor:pointer; padding:4px; font-family:inherit;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="${filled?'#FBBF24':'transparent'}" stroke="${filled?'#FBBF24':'#6B7280'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </button>`;
-      }).join('');
-
-      const ratingLabels = ['', 'Terrible', 'Bad', 'Okay', 'Good', 'Excellent'];
-
-      modal.innerHTML = `
-        <div style="background:#131B2D; border:1px solid #1F2937; border-radius:14px; padding:28px; width:100%; max-width:520px; box-shadow:0 24px 64px rgba(0,0,0,0.6); max-height:90vh; overflow-y:auto;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
-            <h2 style="font-size:20px; font-weight:700; color:#fff;">Write a review</h2>
-            <button id="rev-close" type="button" style="background:transparent; border:none; color:#9CA3AF; font-size:22px; cursor:pointer; padding:4px 10px;">×</button>
-          </div>
-          <p style="font-size:13px; color:#9CA3AF; margin-bottom:20px;">Reviewing: <span style="color:#fff; font-weight:600;">${escHtml(productName)}</span>${tier ? `<span style="color:#6B7280;"> · ${escHtml(tier)}</span>` : ''}</p>
-
-          <label style="display:block; font-size:12px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; margin-bottom:8px;">Your rating <span style="color:#ff3a6e;">*</span></label>
-          <div style="display:flex; gap:4px; align-items:center; margin-bottom:6px;">
-            ${starsHtml}
-          </div>
-          <div id="rev-rating-label" style="font-size:13px; color:${selectedRating?'#FBBF24':'#6B7280'}; font-weight:600; height:20px; margin-bottom:18px;">${selectedRating ? ratingLabels[selectedRating] : 'Click to rate'}</div>
-
-          <label style="display:block; font-size:12px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; margin-bottom:8px;">Your review <span style="color:#ff3a6e;">*</span></label>
-          <textarea id="rev-comment" rows="5" maxlength="2000" placeholder="Share your experience with this product..." style="width:100%; box-sizing:border-box; background:#0a0f1c; border:1px solid #1F2937; border-radius:9px; padding:12px 14px; color:#fff; font-size:13.5px; outline:none; font-family:inherit; resize:vertical; line-height:1.5;"></textarea>
-          <div style="font-size:11.5px; color:#6B7280; margin-top:6px;"><span id="rev-charcount">0</span> / 2000 characters. Reviews are permanent and cannot be edited.</div>
-
-          <div id="rev-error" style="display:none; background:rgba(255,58,110,0.1); border:1px solid rgba(255,58,110,0.3); border-radius:8px; padding:10px 12px; color:#ff3a6e; font-size:12.5px; margin-top:14px;"></div>
-
-          <div style="display:flex; gap:8px; margin-top:20px;">
-            <button id="rev-cancel" type="button" style="flex:1; background:#1A2436; border:1px solid #1F2937; color:#fff; padding:11px; border-radius:9px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;">Cancel</button>
-            <button id="rev-submit" type="button" style="flex:2; background:linear-gradient(135deg,#3A7BD5,#3AABFF); border:none; color:#fff; padding:11px; border-radius:9px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">Submit review</button>
-          </div>
-        </div>
-      `;
-      attach();
-    }
-
-    function showErr(msg) {
-      const e = modal.querySelector('#rev-error');
-      e.textContent = msg; e.style.display = 'block';
-    }
-    function clearErr() {
-      const e = modal.querySelector('#rev-error');
-      e.style.display = 'none';
-    }
-
-    function attach() {
-      modal.querySelector('#rev-close').addEventListener('click', close);
-      modal.querySelector('#rev-cancel').addEventListener('click', close);
-
-      modal.querySelectorAll('.rev-star').forEach(b => {
-        b.addEventListener('click', () => {
-          selectedRating = parseInt(b.dataset.star);
-          render();
-        });
-      });
-
-      const ta = modal.querySelector('#rev-comment');
-      const cc = modal.querySelector('#rev-charcount');
-      ta.addEventListener('input', () => { cc.textContent = ta.value.length; });
-
-      modal.querySelector('#rev-submit').addEventListener('click', async () => {
-        clearErr();
-        const comment = ta.value.trim();
-        if (selectedRating < 1 || selectedRating > 5) { showErr('Please select a rating.'); return; }
-        if (comment.length === 0) { showErr('Please write a comment.'); return; }
-        if (comment.length > 2000) { showErr('Comment too long (max 2000 chars).'); return; }
-
-        const btn = modal.querySelector('#rev-submit');
-        btn.disabled = true; btn.textContent = 'Submitting...';
-        try {
-          const { error } = await window.sb.rpc('submit_review', {
-            p_order_id: order.id,
-            p_rating: selectedRating,
-            p_comment: comment
-          });
-          if (error) throw error;
-
-          // Update local state and close
-          window.MY_REVIEWS[order.id] = { order_id: order.id, rating: selectedRating, comment, created_at: new Date().toISOString() };
-          close();
-          applyFilters();   // re-render order cards
-        } catch (e) {
-          console.error('[review]', e);
-          showErr('Failed: ' + (e.message || e));
-          btn.disabled = false; btn.textContent = 'Submit review';
-        }
-      });
-    }
-
-    modal.addEventListener('click', e => { if (e.target === modal) close(); });
-    render();
-  }
-
-  // ===== Dispute Modal =====
-  const MAX_IMAGES = 5;
-  const MAX_VIDEO_SIZE_MB = 100;
-
-  function openDisputeModal(order) {
-    const existing = document.getElementById('dispute-modal');
-    if (existing) existing.remove();
-
-    let imageFiles = [];   // File[]
-    let videoFile  = null; // File | null
-
-    const modal = document.createElement('div');
-    modal.id = 'dispute-modal';
-    modal.style.cssText = 'position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:20px; overflow-y:auto;';
-
-    modal.innerHTML = `
-      <div style="background:#131B2D; border:1px solid #1F2937; border-radius:14px; padding:28px; width:100%; max-width:560px; box-shadow:0 24px 64px rgba(0,0,0,0.6); max-height:90vh; overflow-y:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px;">
-          <div>
-            <h2 style="font-size:20px; font-weight:700; color:#fff; margin-bottom:4px;">Open dispute</h2>
-            <p style="font-size:12.5px; color:#9CA3AF;">Order #${escHtml(order.order_number)} · ${escHtml((order.products && order.products.name) || '')}</p>
-          </div>
-          <button id="dsp-close" type="button" style="background:transparent; border:none; color:#9CA3AF; font-size:22px; cursor:pointer; padding:4px 10px;">×</button>
-        </div>
-
-        <label style="display:block; font-size:12px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; margin-bottom:6px;">Describe the issue <span style="color:#ff3a6e;">*</span></label>
-        <textarea id="dsp-reason" rows="5" placeholder="Explain what went wrong with this order in detail..." style="width:100%; box-sizing:border-box; background:#0a0f1c; border:1px solid #1F2937; border-radius:9px; padding:12px 14px; color:#fff; font-size:13.5px; outline:none; font-family:inherit; resize:vertical; min-height:100px;"></textarea>
-        <div style="font-size:11.5px; color:#6B7280; margin-top:4px;">Min 10 characters · Required</div>
-
-        <div style="margin-top:18px;">
-          <label style="display:block; font-size:12px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; margin-bottom:6px;">Images (optional, up to ${MAX_IMAGES})</label>
-          <input id="dsp-images" type="file" accept="image/*" multiple style="display:none;">
-          <button id="dsp-pick-images" type="button" style="background:#0a0f1c; border:1px dashed #1F2937; border-radius:9px; padding:10px 14px; color:#9CA3AF; font-size:13px; cursor:pointer; font-family:inherit; width:100%;">+ Add images</button>
-          <div id="dsp-image-previews" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
-        </div>
-
-        <div style="margin-top:18px;">
-          <label style="display:block; font-size:12px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; margin-bottom:6px;">Video (optional, max ${MAX_VIDEO_SIZE_MB}MB)</label>
-          <input id="dsp-video" type="file" accept="video/*" style="display:none;">
-          <button id="dsp-pick-video" type="button" style="background:#0a0f1c; border:1px dashed #1F2937; border-radius:9px; padding:10px 14px; color:#9CA3AF; font-size:13px; cursor:pointer; font-family:inherit; width:100%;">+ Add video</button>
-          <div id="dsp-video-preview" style="margin-top:8px;"></div>
-        </div>
-
-        <div id="dsp-error" style="display:none; background:rgba(255,58,110,0.1); border:1px solid rgba(255,58,110,0.3); border-radius:8px; padding:10px 12px; color:#ff3a6e; font-size:12.5px; margin-top:14px;"></div>
-
-        <div style="display:flex; gap:8px; margin-top:20px;">
-          <button id="dsp-cancel" type="button" style="flex:1; background:#1A2436; border:1px solid #1F2937; color:#fff; padding:11px; border-radius:9px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;">Cancel</button>
-          <button id="dsp-submit" type="button" style="flex:2; background:linear-gradient(135deg,#F59E0B,#D97706); border:none; color:#fff; padding:11px; border-radius:9px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">Submit dispute</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    document.body.style.overflow = 'hidden';
-
-    function close() {
-      modal.remove();
-      document.body.style.overflow = '';
-    }
-    modal.querySelector('#dsp-close').addEventListener('click', close);
-    modal.querySelector('#dsp-cancel').addEventListener('click', close);
-    modal.addEventListener('click', e => { if (e.target === modal) close(); });
-
-    function showErr(msg) {
-      const err = modal.querySelector('#dsp-error');
-      err.textContent = msg;
-      err.style.display = 'block';
-    }
-    function clearErr() {
-      const err = modal.querySelector('#dsp-error');
-      err.style.display = 'none';
-    }
-
-    function renderImagePreviews() {
-      const c = modal.querySelector('#dsp-image-previews');
-      c.innerHTML = imageFiles.map((f, i) => {
-        const url = URL.createObjectURL(f);
-        return `
-          <div style="position:relative; width:64px; height:64px; border-radius:6px; overflow:hidden; border:1px solid #1F2937;">
-            <img src="${url}" style="width:100%; height:100%; object-fit:cover;">
-            <button type="button" data-idx="${i}" class="dsp-rm-img" style="position:absolute; top:2px; right:2px; width:20px; height:20px; background:rgba(0,0,0,0.7); border:none; color:#fff; border-radius:50%; cursor:pointer; font-size:12px; line-height:1; padding:0;">×</button>
-          </div>
-        `;
-      }).join('');
-      c.querySelectorAll('.dsp-rm-img').forEach(b => {
-        b.addEventListener('click', () => {
-          imageFiles.splice(parseInt(b.dataset.idx, 10), 1);
-          renderImagePreviews();
-        });
-      });
-    }
-
-    function renderVideoPreview() {
-      const c = modal.querySelector('#dsp-video-preview');
-      if (!videoFile) { c.innerHTML = ''; return; }
-      const sizeMb = (videoFile.size / 1024 / 1024).toFixed(1);
-      c.innerHTML = `
-        <div style="display:flex; align-items:center; gap:10px; background:#0a0f1c; border:1px solid #1F2937; border-radius:8px; padding:10px 12px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3AABFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2" ry="2"/></svg>
-          <div style="flex:1; font-size:12.5px; color:#fff;">${escHtml(videoFile.name)} <span style="color:#6B7280;">· ${sizeMb}MB</span></div>
-          <button id="dsp-rm-video" type="button" style="background:transparent; border:none; color:#ff3a6e; cursor:pointer; font-size:18px;">×</button>
-        </div>
-      `;
-      modal.querySelector('#dsp-rm-video').addEventListener('click', () => {
-        videoFile = null;
-        renderVideoPreview();
-      });
-    }
-
-    modal.querySelector('#dsp-pick-images').addEventListener('click', () => {
-      modal.querySelector('#dsp-images').click();
-    });
-    modal.querySelector('#dsp-images').addEventListener('change', e => {
-      clearErr();
-      const newFiles = Array.from(e.target.files || []);
-      const slotsLeft = MAX_IMAGES - imageFiles.length;
-      if (newFiles.length > slotsLeft) {
-        showErr(`You can only add up to ${MAX_IMAGES} images total.`);
-      }
-      imageFiles = imageFiles.concat(newFiles.slice(0, slotsLeft));
-      renderImagePreviews();
-      e.target.value = '';
-    });
-
-    modal.querySelector('#dsp-pick-video').addEventListener('click', () => {
-      modal.querySelector('#dsp-video').click();
-    });
-    modal.querySelector('#dsp-video').addEventListener('change', e => {
-      clearErr();
-      const f = (e.target.files || [])[0];
-      if (!f) return;
-      const sizeMb = f.size / 1024 / 1024;
-      if (sizeMb > MAX_VIDEO_SIZE_MB) {
-        showErr(`Video too large (${sizeMb.toFixed(1)}MB). Max ${MAX_VIDEO_SIZE_MB}MB.`);
-        e.target.value = '';
-        return;
-      }
-      videoFile = f;
-      renderVideoPreview();
-      e.target.value = '';
-    });
-
-    modal.querySelector('#dsp-submit').addEventListener('click', async () => {
-      clearErr();
-      const reason = modal.querySelector('#dsp-reason').value.trim();
-      if (reason.length < 10) {
-        showErr('Description must be at least 10 characters.');
-        return;
-      }
-      if (!window.sb) { showErr('Database not connected.'); return; }
-      const { data: { user } } = await window.sb.auth.getUser();
-      if (!user) { showErr('You must be logged in.'); return; }
-
-      const submitBtn = modal.querySelector('#dsp-submit');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Uploading...';
-
-      try {
-        // Upload files to dispute-evidence bucket
-        const uploadedUrls = [];
-        const allFiles = [...imageFiles];
-        if (videoFile) allFiles.push(videoFile);
-
-        for (let i = 0; i < allFiles.length; i++) {
-          const file = allFiles[i];
-          submitBtn.textContent = `Uploading ${i + 1}/${allFiles.length}...`;
-          const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
-          const rand = Math.random().toString(36).substring(2, 8);
-          const path = `${user.id}/dispute-${Date.now()}-${rand}.${ext}`;
-          const { error: upErr } = await window.sb.storage
-            .from('dispute-evidence')
-            .upload(path, file, { cacheControl: '3600', upsert: false });
-          if (upErr) throw upErr;
-          const { data: pub } = window.sb.storage
-            .from('dispute-evidence')
-            .getPublicUrl(path);
-          uploadedUrls.push(pub.publicUrl);
-        }
-
-        submitBtn.textContent = 'Submitting...';
-        const { error: rpcErr } = await window.sb.rpc('open_dispute', {
-          p_order_id: order.id,
-          p_reason: reason,
-          p_evidence_files: uploadedUrls
-        });
-        if (rpcErr) throw rpcErr;
-
-        close();
-        await reload();
-        alert('Dispute submitted. Admin will review and respond.');
-      } catch (e) {
-        console.error('[dispute] submit failed', e);
-        showErr('Submit failed: ' + (e.message || e));
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit dispute';
-      }
-    });
   }
 
   async function boot() {
     setupFilters();
     await reload();
-    // Reload when auth state changes (login/logout)
     if (window.sb && window.sb.auth) {
       try { window.sb.auth.onAuthStateChange(() => reload()); } catch (e) {}
     }

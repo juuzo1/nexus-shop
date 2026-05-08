@@ -851,6 +851,16 @@
       Orders <span id="admin-disputed-badge" style="display:none; margin-left:auto; background:#F59E0B; color:#0a0e1a; font-size:10px; font-weight:800; padding:2px 7px; border-radius:999px;">0</span>
     </a>
 
+    <a class="sidebar-link" data-page="deposits">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Deposits <span id="admin-deposits-badge" style="display:none; margin-left:auto; background:#3AABFF; color:#0a0e1a; font-size:10px; font-weight:800; padding:2px 7px; border-radius:999px;">0</span>
+    </a>
+
+    <a class="sidebar-link" data-page="withdrawals">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 21 7 17 3"/><line x1="21" y1="7" x2="9" y2="7"/><polyline points="7 21 3 17 7 13"/><line x1="15" y1="17" x2="3" y2="17"/></svg>
+      Withdrawals <span id="admin-withdrawals-badge" style="display:none; margin-left:auto; background:#F59E0B; color:#0a0e1a; font-size:10px; font-weight:800; padding:2px 7px; border-radius:999px;">0</span>
+    </a>
+
     <a class="sidebar-link" data-page="users">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Users
@@ -1195,6 +1205,99 @@
       </div>
     </div>
 
+    <!-- ========== MANUAL DEPOSITS ========== -->
+    <div class="page" data-page-name="deposits">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Manual Deposits</div>
+          <div class="page-subtitle">Review and approve manual USDT deposit requests</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="color: var(--text-muted); font-size: 13px;">
+            Pending: <strong id="dep-pending-count" style="color: var(--text-primary);">0</strong>
+          </div>
+          <button class="btn" onclick="renderManualDeposits()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter chips -->
+      <div style="display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap;">
+        <button class="dep-filter active" data-status="pending"  style="background:rgba(245,158,11,0.18); color:#F59E0B; border:1px solid rgba(245,158,11,0.35); padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">Pending <span id="dep-cnt-pending">0</span></button>
+        <button class="dep-filter" data-status="approved" style="background:#1A2436; color:#cbd5e1; border:1px solid #1F2937; padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">Approved <span id="dep-cnt-approved">0</span></button>
+        <button class="dep-filter" data-status="rejected" style="background:#1A2436; color:#cbd5e1; border:1px solid #1F2937; padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">Rejected <span id="dep-cnt-rejected">0</span></button>
+        <button class="dep-filter" data-status="all" style="background:#1A2436; color:#cbd5e1; border:1px solid #1F2937; padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">All <span id="dep-cnt-all">0</span></button>
+      </div>
+
+      <div class="card" style="padding: 0; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="background: rgba(58, 171, 255, 0.05); border-bottom: 1px solid var(--border);">
+              <th style="padding: 12px 14px; text-align: left; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">When</th>
+              <th style="padding: 12px 14px; text-align: left; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">User</th>
+              <th style="padding: 12px 14px; text-align: left; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">Network</th>
+              <th style="padding: 12px 14px; text-align: left; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">Sender wallet</th>
+              <th style="padding: 12px 14px; text-align: right; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">Amount</th>
+              <th style="padding: 12px 14px; text-align: center; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">Status</th>
+              <th style="padding: 12px 14px; text-align: right; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="deposits-tbody">
+            <tr><td colspan="7" style="padding:32px; text-align:center; color:var(--text-muted);">Loading...</td></tr>
+          </tbody>
+        </table>
+        <div id="deposits-empty" style="display:none; padding:32px; text-align:center; color:var(--text-muted);">No deposit requests yet</div>
+      </div>
+    </div>
+
+    <!-- ========== WITHDRAWALS ========== -->
+    <div class="page" data-page-name="withdrawals">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Withdrawals</div>
+          <div class="page-subtitle">Process and approve user withdrawal requests</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="color: var(--text-muted); font-size: 13px;">
+            Pending: <strong id="wd-pending-count" style="color: var(--text-primary);">0</strong>
+          </div>
+          <button class="btn" onclick="renderWithdrawals()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap;">
+        <button class="wd-filter active" data-status="pending"  style="background:rgba(245,158,11,0.18); color:#F59E0B; border:1px solid rgba(245,158,11,0.35); padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">Pending <span id="wd-cnt-pending">0</span></button>
+        <button class="wd-filter" data-status="approved" style="background:#1A2436; color:#cbd5e1; border:1px solid #1F2937; padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">Approved <span id="wd-cnt-approved">0</span></button>
+        <button class="wd-filter" data-status="rejected" style="background:#1A2436; color:#cbd5e1; border:1px solid #1F2937; padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">Rejected <span id="wd-cnt-rejected">0</span></button>
+        <button class="wd-filter" data-status="all" style="background:#1A2436; color:#cbd5e1; border:1px solid #1F2937; padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">All <span id="wd-cnt-all">0</span></button>
+      </div>
+
+      <div class="card" style="padding: 0; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="background: rgba(58, 171, 255, 0.05); border-bottom: 1px solid var(--border);">
+              <th style="padding: 12px 14px; text-align: left; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">When</th>
+              <th style="padding: 12px 14px; text-align: left; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">User</th>
+              <th style="padding: 12px 14px; text-align: left; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">Coin / Network</th>
+              <th style="padding: 12px 14px; text-align: left; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">Recipient</th>
+              <th style="padding: 12px 14px; text-align: right; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">Amount</th>
+              <th style="padding: 12px 14px; text-align: center; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">Status</th>
+              <th style="padding: 12px 14px; text-align: right; color: var(--text-muted); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="withdrawals-tbody">
+            <tr><td colspan="7" style="padding:32px; text-align:center; color:var(--text-muted);">Loading...</td></tr>
+          </tbody>
+        </table>
+        <div id="withdrawals-empty" style="display:none; padding:32px; text-align:center; color:var(--text-muted);">No withdraw requests yet</div>
+      </div>
+    </div>
+
     <!-- ========== USERS ========== -->
     <div class="page" data-page-name="users">
       <div class="page-head">
@@ -1221,7 +1324,10 @@
               <tr style="background: var(--bg-elevated); color: var(--text-muted); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase;">
                 <th style="text-align: left; padding: 12px 16px; font-weight: 600;">Display name</th>
                 <th style="text-align: left; padding: 12px 16px; font-weight: 600;">User ID</th>
+                <th style="text-align: right; padding: 12px 16px; font-weight: 600;">USDT</th>
+                <th style="text-align: right; padding: 12px 16px; font-weight: 600;">USDC</th>
                 <th style="text-align: left; padding: 12px 16px; font-weight: 600;">Created</th>
+                <th style="text-align: right; padding: 12px 16px; font-weight: 600;">Actions</th>
               </tr>
             </thead>
             <tbody id="users-tbody"></tbody>
@@ -1491,6 +1597,8 @@ function navigate(pageName) {
   if (pageName === 'products') renderProducts();
   if (pageName === 'pending') renderPending();
   if (pageName === 'orders') renderAdminOrders();
+  if (pageName === 'deposits') renderManualDeposits();
+  if (pageName === 'withdrawals') renderWithdrawals();
   if (pageName === 'users') renderUsers();
 }
 document.querySelectorAll('.sidebar-link[data-page]').forEach(l => {
@@ -2436,13 +2544,392 @@ async function refreshDisputedBadge() {
 }
 setTimeout(refreshDisputedBadge, 1800);
 
+/* ============================================================
+   MANUAL DEPOSITS PAGE (admin)
+   ============================================================ */
+let DEP_CACHE = [];
+let DEP_FILTER = 'pending';
+
+async function renderManualDeposits() {
+  const tbody = document.getElementById('deposits-tbody');
+  const empty = document.getElementById('deposits-empty');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="7" style="padding:32px; text-align:center; color:var(--text-muted);">Loading...</td></tr>';
+
+  try {
+    const { data, error } = await sb
+      .from('manual_deposit_requests')
+      .select('id, user_id, network, sender_address, claimed_amount, approved_amount, target_coin, status, admin_note, resolved_at, created_at')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    DEP_CACHE = data || [];
+
+    // Pull user names
+    const ids = [...new Set(DEP_CACHE.map(d => d.user_id))];
+    const nameMap = {};
+    if (ids.length) {
+      const { data: profs } = await sb.from('profiles').select('id, display_name').in('id', ids);
+      (profs || []).forEach(p => { nameMap[p.id] = p.display_name; });
+    }
+
+    renderDepositsRows(nameMap);
+    refreshDepositsBadge();
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:32px; text-align:center; color:#ff3a6e;">Error: ${e.message}</td></tr>`;
+  }
+}
+
+function renderDepositsRows(nameMap) {
+  const tbody = document.getElementById('deposits-tbody');
+  const empty = document.getElementById('deposits-empty');
+
+  // Update counts
+  const buckets = { all: DEP_CACHE.length, pending: 0, approved: 0, rejected: 0 };
+  DEP_CACHE.forEach(d => { buckets[d.status] = (buckets[d.status] || 0) + 1; });
+  document.getElementById('dep-cnt-all').textContent = buckets.all;
+  document.getElementById('dep-cnt-pending').textContent = buckets.pending;
+  document.getElementById('dep-cnt-approved').textContent = buckets.approved;
+  document.getElementById('dep-cnt-rejected').textContent = buckets.rejected;
+  document.getElementById('dep-pending-count').textContent = buckets.pending;
+
+  const filtered = DEP_FILTER === 'all' ? DEP_CACHE : DEP_CACHE.filter(d => d.status === DEP_FILTER);
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  function escD(s) {
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  const STATUS_BADGE = {
+    pending:  '<span style="background:rgba(245,158,11,0.18); color:#F59E0B; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">PENDING</span>',
+    approved: '<span style="background:rgba(16,185,129,0.15); color:#10B981; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">APPROVED</span>',
+    rejected: '<span style="background:rgba(255,58,110,0.15); color:#ff3a6e; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">REJECTED</span>'
+  };
+
+  tbody.innerHTML = filtered.map(d => {
+    const date = new Date(d.created_at);
+    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' +
+                    date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const username = nameMap[d.user_id] || d.user_id.slice(0, 8);
+    const shortAddr = d.sender_address.length > 18
+      ? d.sender_address.slice(0, 8) + '...' + d.sender_address.slice(-6)
+      : d.sender_address;
+
+    let actions = '';
+    if (d.status === 'pending') {
+      actions = `
+        <button class="ord-action-btn release" onclick="adminApproveDeposit('${d.id}', ${d.claimed_amount})">Approve</button>
+        <button class="ord-action-btn refund" onclick="adminRejectDeposit('${d.id}')">Reject</button>
+      `;
+    } else if (d.status === 'approved' && d.admin_note) {
+      actions = `<span style="color:#9CA3AF; font-size:11.5px;">${escD(d.admin_note)}</span>`;
+    } else if (d.status === 'rejected' && d.admin_note) {
+      actions = `<span style="color:#9CA3AF; font-size:11.5px;">${escD(d.admin_note)}</span>`;
+    }
+
+    const amountDisplay = d.status === 'approved' && d.approved_amount != null
+      ? `${parseFloat(d.approved_amount).toFixed(2)} ${escD(d.target_coin)}`
+      : `${parseFloat(d.claimed_amount).toFixed(2)} ${escD(d.target_coin)}`;
+
+    return `
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 12px 14px; color:#9CA3AF; font-size:12px;">${dateStr}</td>
+        <td style="padding: 12px 14px; color:#fff;">${escD(username)}</td>
+        <td style="padding: 12px 14px;"><span style="background:rgba(58,171,255,0.12); color:#3AABFF; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600;">${escD(d.network)}</span></td>
+        <td style="padding: 12px 14px; color:#cbd5e1; font-family:monospace; font-size:11.5px;" title="${escD(d.sender_address)}">${escD(shortAddr)}</td>
+        <td style="padding: 12px 14px; text-align:right; color:#fff; font-weight:600;">${amountDisplay}</td>
+        <td style="padding: 12px 14px; text-align:center;">${STATUS_BADGE[d.status] || d.status}</td>
+        <td style="padding: 12px 14px; text-align:right;"><div style="display:inline-flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">${actions}</div></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Wire filters once
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.dep-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      DEP_FILTER = btn.dataset.status;
+      document.querySelectorAll('.dep-filter').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = '#1A2436';
+        b.style.color = '#cbd5e1';
+        b.style.borderColor = '#1F2937';
+      });
+      btn.classList.add('active');
+      btn.style.background = 'rgba(58,171,255,0.18)';
+      btn.style.color = '#3AABFF';
+      btn.style.borderColor = 'rgba(58,171,255,0.35)';
+      // re-render with current cache
+      const ids = [...new Set(DEP_CACHE.map(d => d.user_id))];
+      const nameMap = {};
+      sb.from('profiles').select('id, display_name').in('id', ids).then(({ data }) => {
+        (data || []).forEach(p => { nameMap[p.id] = p.display_name; });
+        renderDepositsRows(nameMap);
+      });
+    });
+  });
+});
+
+async function adminApproveDeposit(requestId, claimedAmount) {
+  const input = prompt(`Approve this deposit?\n\nClaimed amount: ${claimedAmount} USDT.\nEnter the actual amount to credit (leave blank to use claimed amount):`, '');
+  if (input === null) return;
+  let approveAmount = null;
+  if (input.trim() !== '') {
+    approveAmount = parseFloat(input);
+    if (isNaN(approveAmount) || approveAmount <= 0) {
+      alert('Invalid amount.');
+      return;
+    }
+  }
+  const note = prompt('Admin note (optional, e.g., TXID for reference):', '');
+
+  try {
+    const { error } = await sb.rpc('admin_resolve_manual_deposit', {
+      p_request_id: requestId,
+      p_action: 'approve',
+      p_amount: approveAmount,
+      p_admin_note: note || null
+    });
+    if (error) throw error;
+    alert('Deposit approved & credited.');
+    renderManualDeposits();
+  } catch (e) {
+    alert('Approve failed: ' + (e.message || e));
+  }
+}
+
+async function adminRejectDeposit(requestId) {
+  const note = prompt('Reason for rejection:', '');
+  if (note === null) return;
+
+  try {
+    const { error } = await sb.rpc('admin_resolve_manual_deposit', {
+      p_request_id: requestId,
+      p_action: 'reject',
+      p_amount: null,
+      p_admin_note: note || null
+    });
+    if (error) throw error;
+    alert('Deposit rejected.');
+    renderManualDeposits();
+  } catch (e) {
+    alert('Reject failed: ' + (e.message || e));
+  }
+}
+
+async function refreshDepositsBadge() {
+  if (!sb) return;
+  try {
+    const { count } = await sb.from('manual_deposit_requests')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending');
+    const badge = document.getElementById('admin-deposits-badge');
+    if (badge) {
+      if (count && count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  } catch (e) {}
+}
+setTimeout(refreshDepositsBadge, 2000);
+
+/* ============================================================
+   WITHDRAWALS PAGE (admin)
+   ============================================================ */
+let WD_CACHE = [];
+let WD_FILTER = 'pending';
+
+async function renderWithdrawals() {
+  const tbody = document.getElementById('withdrawals-tbody');
+  const empty = document.getElementById('withdrawals-empty');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="padding:32px; text-align:center; color:var(--text-muted);">Loading...</td></tr>';
+
+  try {
+    const { data, error } = await sb
+      .from('withdraw_requests')
+      .select('id, user_id, coin, network, recipient_address, amount, status, admin_note, tx_hash, resolved_at, created_at')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    WD_CACHE = data || [];
+
+    const ids = [...new Set(WD_CACHE.map(d => d.user_id))];
+    const nameMap = {};
+    if (ids.length) {
+      const { data: profs } = await sb.from('profiles').select('id, display_name').in('id', ids);
+      (profs || []).forEach(p => { nameMap[p.id] = p.display_name; });
+    }
+
+    renderWithdrawRows(nameMap);
+    refreshWithdrawalsBadge();
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:32px; text-align:center; color:#ff3a6e;">Error: ${e.message}</td></tr>`;
+  }
+}
+
+function renderWithdrawRows(nameMap) {
+  const tbody = document.getElementById('withdrawals-tbody');
+  const empty = document.getElementById('withdrawals-empty');
+
+  const buckets = { all: WD_CACHE.length, pending: 0, approved: 0, rejected: 0 };
+  WD_CACHE.forEach(d => { buckets[d.status] = (buckets[d.status] || 0) + 1; });
+  document.getElementById('wd-cnt-all').textContent = buckets.all;
+  document.getElementById('wd-cnt-pending').textContent = buckets.pending;
+  document.getElementById('wd-cnt-approved').textContent = buckets.approved;
+  document.getElementById('wd-cnt-rejected').textContent = buckets.rejected;
+  document.getElementById('wd-pending-count').textContent = buckets.pending;
+
+  const filtered = WD_FILTER === 'all' ? WD_CACHE : WD_CACHE.filter(d => d.status === WD_FILTER);
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  function escD(s) {
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  const STATUS_BADGE = {
+    pending:  '<span style="background:rgba(245,158,11,0.18); color:#F59E0B; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">PENDING</span>',
+    approved: '<span style="background:rgba(16,185,129,0.15); color:#10B981; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">APPROVED</span>',
+    rejected: '<span style="background:rgba(255,58,110,0.15); color:#ff3a6e; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;">REJECTED</span>'
+  };
+
+  tbody.innerHTML = filtered.map(d => {
+    const date = new Date(d.created_at);
+    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' +
+                    date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const username = nameMap[d.user_id] || d.user_id.slice(0, 8);
+    const shortAddr = d.recipient_address.length > 18
+      ? d.recipient_address.slice(0, 8) + '...' + d.recipient_address.slice(-6)
+      : d.recipient_address;
+
+    let actions = '';
+    if (d.status === 'pending') {
+      actions = `
+        <button class="ord-action-btn release" onclick="adminApproveWithdraw('${d.id}')">Approve</button>
+        <button class="ord-action-btn refund" onclick="adminRejectWithdraw('${d.id}')">Reject</button>
+      `;
+    } else if (d.tx_hash) {
+      actions = `<span style="color:#9CA3AF; font-size:11px; font-family:monospace;" title="${escD(d.tx_hash)}">${escD(d.tx_hash.slice(0,10))}...</span>`;
+    } else if (d.admin_note) {
+      actions = `<span style="color:#9CA3AF; font-size:11.5px;">${escD(d.admin_note)}</span>`;
+    }
+
+    return `
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 12px 14px; color:#9CA3AF; font-size:12px;">${dateStr}</td>
+        <td style="padding: 12px 14px; color:#fff;">${escD(username)}</td>
+        <td style="padding: 12px 14px;"><span style="background:rgba(58,171,255,0.12); color:#3AABFF; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600;">${escD(d.coin)} · ${escD(d.network)}</span></td>
+        <td style="padding: 12px 14px; color:#cbd5e1; font-family:monospace; font-size:11.5px;" title="${escD(d.recipient_address)}">${escD(shortAddr)}</td>
+        <td style="padding: 12px 14px; text-align:right; color:#fff; font-weight:600;">${parseFloat(d.amount).toFixed(2)} ${escD(d.coin)}</td>
+        <td style="padding: 12px 14px; text-align:center;">${STATUS_BADGE[d.status] || d.status}</td>
+        <td style="padding: 12px 14px; text-align:right;"><div style="display:inline-flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">${actions}</div></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.wd-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      WD_FILTER = btn.dataset.status;
+      document.querySelectorAll('.wd-filter').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = '#1A2436';
+        b.style.color = '#cbd5e1';
+        b.style.borderColor = '#1F2937';
+      });
+      btn.classList.add('active');
+      btn.style.background = 'rgba(58,171,255,0.18)';
+      btn.style.color = '#3AABFF';
+      btn.style.borderColor = 'rgba(58,171,255,0.35)';
+      const ids = [...new Set(WD_CACHE.map(d => d.user_id))];
+      const nameMap = {};
+      sb.from('profiles').select('id, display_name').in('id', ids).then(({ data }) => {
+        (data || []).forEach(p => { nameMap[p.id] = p.display_name; });
+        renderWithdrawRows(nameMap);
+      });
+    });
+  });
+});
+
+async function adminApproveWithdraw(requestId) {
+  const txHash = prompt('Enter the blockchain TX hash (proof of payment) to mark this withdrawal as approved:', '');
+  if (txHash === null) return;
+  const note = prompt('Admin note (optional):', '');
+  try {
+    const { error } = await sb.rpc('admin_resolve_withdraw', {
+      p_request_id: requestId,
+      p_action: 'approve',
+      p_tx_hash: txHash || null,
+      p_admin_note: note || null
+    });
+    if (error) throw error;
+    alert('Withdraw approved.');
+    renderWithdrawals();
+  } catch (e) {
+    alert('Approve failed: ' + (e.message || e));
+  }
+}
+
+async function adminRejectWithdraw(requestId) {
+  const note = prompt('Reason for rejection (the user will get their balance refunded):', '');
+  if (note === null) return;
+  try {
+    const { error } = await sb.rpc('admin_resolve_withdraw', {
+      p_request_id: requestId,
+      p_action: 'reject',
+      p_tx_hash: null,
+      p_admin_note: note || null
+    });
+    if (error) throw error;
+    alert('Withdraw rejected and refunded to user.');
+    renderWithdrawals();
+  } catch (e) {
+    alert('Reject failed: ' + (e.message || e));
+  }
+}
+
+async function refreshWithdrawalsBadge() {
+  if (!sb) return;
+  try {
+    const { count } = await sb.from('withdraw_requests')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending');
+    const badge = document.getElementById('admin-withdrawals-badge');
+    if (badge) {
+      if (count && count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  } catch (e) {}
+}
+setTimeout(refreshWithdrawalsBadge, 2200);
+
 async function renderUsers() {
   const tbody = document.getElementById('users-tbody');
   const empty = document.getElementById('users-empty');
   const countEl = document.getElementById('users-count');
   if (!tbody) return;
 
-  tbody.innerHTML = '<tr><td colspan="3" style="padding: 30px; text-align: center; color: var(--text-muted);">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: var(--text-muted);">Loading...</td></tr>';
   empty.style.display = 'none';
 
   try {
@@ -2452,11 +2939,29 @@ async function renderUsers() {
       .order('created_at', { ascending: false });
     if (error) throw error;
     USERS_CACHE = data || [];
+
+    // Load all wallets balances
+    const userIds = USERS_CACHE.map(u => u.id);
+    const balanceMap = {};
+    if (userIds.length) {
+      const { data: wallets } = await window.sb.from('wallets')
+        .select('user_id, coin, balance')
+        .in('user_id', userIds);
+      (wallets || []).forEach(w => {
+        if (!balanceMap[w.user_id]) balanceMap[w.user_id] = {};
+        balanceMap[w.user_id][w.coin] = parseFloat(w.balance);
+      });
+    }
+    USERS_CACHE.forEach(u => {
+      u._usdt = (balanceMap[u.id] && balanceMap[u.id].USDT) || 0;
+      u._usdc = (balanceMap[u.id] && balanceMap[u.id].USDC) || 0;
+    });
+
     countEl.textContent = USERS_CACHE.length;
     paintUsers(document.getElementById('users-search').value);
   } catch (e) {
     console.error('[users]', e);
-    tbody.innerHTML = '<tr><td colspan="3" style="padding: 30px; text-align: center; color: #f87171;">Failed to load users: ' + (e.message || e) + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #f87171;">Failed to load users: ' + (e.message || e) + '</td></tr>';
   }
 }
 
@@ -2492,10 +2997,45 @@ function paintUsers(query) {
           </div>
         </td>
         <td style="padding: 12px 16px; color: var(--text-muted); font-size: 12px; font-family: monospace;">${u.id}</td>
+        <td style="padding: 12px 16px; color: var(--text-primary); text-align: right; font-weight: 600;">${u._usdt.toFixed(2)}</td>
+        <td style="padding: 12px 16px; color: var(--text-primary); text-align: right; font-weight: 600;">${u._usdc.toFixed(2)}</td>
         <td style="padding: 12px 16px; color: var(--text-muted);">${dateStr}</td>
+        <td style="padding: 12px 16px; text-align: right;">
+          <button class="ord-action-btn" onclick="adminAdjustBalance('${u.id}', '${escName.replace(/'/g, '\\\'')}')" style="background:#1A2436; border:1px solid #1F2937; color:#3AABFF; padding:5px 12px; border-radius:6px; font-size:11.5px; cursor:pointer; font-family:inherit; font-weight:600;">Adjust balance</button>
+        </td>
       </tr>
     `;
   }).join('');
+}
+
+async function adminAdjustBalance(userId, displayName) {
+  const coin = prompt(`Adjust balance for: ${displayName}\n\nWhich coin? (USDT or USDC)`, 'USDT');
+  if (coin === null) return;
+  const c = (coin || '').toUpperCase().trim();
+  if (c !== 'USDT' && c !== 'USDC') { alert('Invalid coin. Use USDT or USDC.'); return; }
+
+  const amountStr = prompt(`Amount to ADD (positive) or SUBTRACT (negative).\n\nExamples:\n  +50  → adds $50\n  -10  → removes $10`, '0');
+  if (amountStr === null) return;
+  const amount = parseFloat(amountStr);
+  if (isNaN(amount) || amount === 0) { alert('Invalid amount.'); return; }
+
+  const note = prompt('Reason / note (optional):', '');
+
+  if (!confirm(`Confirm: ${amount > 0 ? 'ADD' : 'SUBTRACT'} ${Math.abs(amount)} ${c} ${amount > 0 ? 'to' : 'from'} ${displayName}?`)) return;
+
+  try {
+    const { error } = await sb.rpc('admin_credit_user', {
+      p_user_id: userId,
+      p_coin: c,
+      p_amount: amount,
+      p_note: note || null
+    });
+    if (error) throw error;
+    alert('Balance adjusted.');
+    renderUsers();
+  } catch (e) {
+    alert('Adjust failed: ' + (e.message || e));
+  }
 }
 
 // Hook the search box (delegate, runs once when first rendered)

@@ -2878,6 +2878,10 @@
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg>
                   Order History
                 </a>
+                <a class="auth-menu-item" href="transactions.html">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13"/><path d="m13 4 3 3-3 3"/><path d="M21 17H8"/><path d="m11 14-3 3 3 3"/></svg>
+                  Transactions
+                </a>
                 <a class="auth-menu-item" href="wishlist.html">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
                   Wishlist
@@ -4187,15 +4191,29 @@ function goToSimilarPage(i) {
     if (cta) {
       e.preventDefault();
       e.stopPropagation();
-      openModal();
+      if (typeof window.openWalletModal === 'function') {
+        window.openWalletModal();
+      }
     }
   });
   closeBtn.addEventListener('click', closeModal);
   backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal(); });
 
-  // Placeholder action handlers
-  ['wallet-withdraw','wallet-deposit','wallet-buy-submit','wallet-swap-preview'].forEach(id => {
+  // Action handlers
+  const depositBtn = document.getElementById('wallet-deposit');
+  if (depositBtn) {
+    depositBtn.addEventListener('click', () => {
+      const walletBtn = document.getElementById('wallet-btn');
+      if (walletBtn) walletBtn.classList.remove('open');
+      if (typeof window.openDepositModal === 'function') {
+        window.openDepositModal();
+      } else {
+        console.warn('[wallet] openDepositModal not loaded');
+      }
+    });
+  }
+  ['wallet-withdraw','wallet-buy-submit','wallet-swap-preview'].forEach(id => {
     const btn = document.getElementById(id);
     if (btn) btn.addEventListener('click', () => console.log('[wallet]', id));
   });
@@ -4374,8 +4392,10 @@ function goToSimilarPage(i) {
 
   trigger.addEventListener('click', e => {
     e.stopPropagation();
-    if (wrap.classList.contains('open')) close();
-    else { paintList(searchEl.value); open(); searchEl.focus(); }
+    e.preventDefault();
+    if (typeof window.openWalletModal === 'function') {
+      window.openWalletModal();
+    }
   });
 
   // Stop dropdown clicks from bubbling to outside-close
